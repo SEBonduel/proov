@@ -130,8 +130,12 @@ export function CandidateMatchCard({
           <form action={startConversation}>
             <input type="hidden" name="offerId" value={offerId} />
             <input type="hidden" name="candidateId" value={candidateId} />
-            <button className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300">
-              ✉ Contacter
+            <button className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="m22 7-10 5L2 7" />
+              </svg>
+              Contacter
             </button>
           </form>
         </div>
