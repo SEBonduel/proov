@@ -47,7 +47,7 @@ export default async function MePage() {
             href={`/candidates/${candidate.id}`}
             className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-400 transition hover:border-emerald-400/40 hover:text-emerald-300"
           >
-            voir mon profil public →
+            Voir mon profil public →
           </Link>
         </section>
       </Reveal>
@@ -59,7 +59,7 @@ export default async function MePage() {
           </h2>
           <div className="space-y-2.5">
             {topSkills.map((s) => (
-              <div key={s.id} className="grid grid-cols-[10rem_1fr_auto] items-center gap-3">
+              <div key={s.id} className="grid grid-cols-[7rem_1fr_auto] items-center gap-3 sm:grid-cols-[10rem_1fr_auto]">
                 <span className="truncate text-sm">{s.name}</span>
                 <ProofBar value={s.proofStrength} />
                 <span className="font-mono text-xs text-slate-500">{s.proofStrength}/100</span>

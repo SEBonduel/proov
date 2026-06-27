@@ -30,13 +30,13 @@ export default async function DashboardPage() {
             compétences <span className="text-slate-200">prouvées</span>, et les classe
             pour vos offres avec un score <span className="text-slate-200">explicable</span>.
           </p>
-          <div className="mt-8 inline-flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 font-mono text-sm text-slate-400">
+          <div className="mt-8 flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 font-mono text-xs text-slate-400 sm:text-sm">
             <span className="text-emerald-400">$</span>
             <span>
               proov match <span className="text-slate-200">--offer</span>{" "}
               <span className="text-amber-300">&quot;Frontend React&quot;</span>
             </span>
-            <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-emerald-400/80" />
+            <span className="inline-block h-4 w-2 animate-pulse bg-emerald-400/80" />
           </div>
         </div>
       </section>
@@ -55,14 +55,14 @@ export default async function DashboardPage() {
               >
                 + Nouvelle offre
               </Link>
-            ) : (
+            ) : !user ? (
               <Link
                 href="/login"
                 className="rounded-lg border border-white/10 px-3.5 py-1.5 text-sm text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300"
               >
                 Publier une offre →
               </Link>
-            )}
+            ) : null}
           </div>
         </Reveal>
 

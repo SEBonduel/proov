@@ -41,7 +41,7 @@ export function ScoreBadge({ score, label }: { score: number; label?: string }) 
   const t = scoreTier(score);
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-sm font-semibold ring-1 tabular-nums ${t.bg} ${t.text} ${t.ring}`}
+      className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1 font-mono text-sm font-semibold ring-1 tabular-nums ${t.bg} ${t.text} ${t.ring}`}
     >
       {score}%{label ? <span className="font-normal opacity-70">· {label}</span> : null}
     </span>

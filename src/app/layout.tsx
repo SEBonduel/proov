@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { Avatar } from "@/components/match-ui";
+import { Logo } from "@/components/Logo";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -26,32 +27,24 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <header className="sticky top-0 z-50 border-b border-white/10 bg-[#08080c]/80 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
-            <Link href="/" className="group flex items-center gap-3">
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-rose-500/80" />
-                <span className="h-3 w-3 rounded-full bg-amber-400/80" />
-                <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
-              </span>
-              <span className="font-mono text-sm text-slate-400">
-                <span className="font-semibold text-slate-100">proov</span>
-                <span className="text-emerald-400"> ~</span> matching
-              </span>
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6 sm:py-3.5">
+            <Link href="/" className="shrink-0">
+              <Logo />
             </Link>
 
-            <nav className="flex items-center gap-1 font-mono text-sm">
+            <nav className="flex items-center gap-0.5 font-mono text-sm sm:gap-1">
               <Link href="/" className={navLink}>Offres</Link>
               {isRecruiter ? (
                 <Link href="/candidates" className={navLink}>Candidats</Link>
               ) : null}
               {user?.role === "CANDIDATE" ? (
-                <Link href="/me" className={navLink}>Mon profil</Link>
+                <Link href="/me" className={navLink}>Profil</Link>
               ) : null}
 
               {user ? (
-                <div className="ml-2 flex items-center gap-2.5 border-l border-white/10 pl-3">
+                <div className="ml-1 flex items-center gap-2 border-l border-white/10 pl-2 sm:ml-2 sm:pl-3">
                   <Avatar name={user.name ?? "?"} seed={user.email ?? user.name ?? "u"} size={28} />
-                  <span className="hidden text-xs text-slate-400 sm:inline">
+                  <span className="hidden text-xs text-slate-400 md:inline">
                     {user.name}
                     {user.role ? (
                       <span className="ml-1 rounded bg-white/5 px-1 text-[10px] uppercase text-slate-500">
@@ -65,13 +58,24 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                       await signOut({ redirectTo: "/" });
                     }}
                   >
-                    <button className={navLink} type="submit">↩</button>
+                    <button
+                      type="submit"
+                      title="Se déconnecter"
+                      className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-slate-400 transition hover:bg-white/5 hover:text-rose-300"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      <span className="hidden sm:inline">Déconnexion</span>
+                    </button>
                   </form>
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="ml-2 rounded-lg bg-emerald-400 px-3 py-1.5 font-semibold text-emerald-950 transition hover:bg-emerald-300"
+                  className="ml-1 rounded-lg bg-emerald-400 px-3 py-1.5 font-semibold text-emerald-950 transition hover:bg-emerald-300 sm:ml-2"
                 >
                   Se connecter
                 </Link>
@@ -84,7 +88,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
         <footer className="border-t border-white/10">
           <div className="mx-auto max-w-6xl px-6 py-5 text-center font-mono text-xs text-slate-600">
-            proov — la preuve par le code, pas les promesses du CV.
+            Proov — la preuve par le code, pas les promesses du CV.
           </div>
         </footer>
       </body>
