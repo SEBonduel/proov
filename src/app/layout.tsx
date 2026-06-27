@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { getUnreadConversationCount } from "@/lib/queries";
 import { Avatar } from "@/components/match-ui";
 import { Logo } from "@/components/Logo";
 import "./globals.css";
@@ -22,6 +23,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const session = await auth();
   const user = session?.user ?? null;
   const isRecruiter = user?.role === "RECRUITER" || user?.role === "ADMIN";
+  const unread = user ? await getUnreadConversationCount(user.id) : 0;
 
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
@@ -41,7 +43,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 <Link href="/me" className={navLink}>Profil</Link>
               ) : null}
               {user ? (
-                <Link href="/messages" className={navLink}>Messages</Link>
+                <Link href="/messages" className={`relative ${navLink}`}>
+                  Messages
+                  {unread > 0 ? (
+                    <span className="ml-1.5 rounded-full bg-emerald-400 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-emerald-950">
+                      {unread}
+                    </span>
+                  ) : null}
+                </Link>
               ) : null}
 
               {user ? (

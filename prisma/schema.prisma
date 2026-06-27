@@ -257,6 +257,9 @@ model Conversation {
   candidateUser   User    @relation("CandidateConversations", fields: [candidateUserId], references: [id], onDelete: Cascade)
 
   messages  Message[]
+  // Dernière consultation par chaque participant (pour les non-lus).
+  recruiterReadAt DateTime?
+  candidateReadAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

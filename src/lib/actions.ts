@@ -221,6 +221,33 @@ export async function applyToOffer(_prev: ApplyState, formData: FormData): Promi
     update: { appliedAt: new Date(), score: result.score, breakdown: result as unknown as Prisma.InputJsonValue },
   });
 
+  // Note de motivation optionnelle → démarre une conversation avec le recruteur.
+  const message = String(formData.get("message") ?? "").trim();
+  if (message && candidate.userId) {
+    const conversation = await prisma.conversation.upsert({
+      where: {
+        offerId_recruiterId_candidateUserId: {
+          offerId,
+          recruiterId: offer.recruiterId,
+          candidateUserId: candidate.userId,
+        },
+      },
+      create: {
+        offerId,
+        recruiterId: offer.recruiterId,
+        candidateUserId: candidate.userId,
+      },
+      update: {},
+    });
+    await prisma.message.create({
+      data: {
+        conversationId: conversation.id,
+        senderId: candidate.userId,
+        body: message.slice(0, 2000),
+      },
+    });
+  }
+
   revalidatePath(`/offers/${offerId}`);
   return { applied: true };
 }

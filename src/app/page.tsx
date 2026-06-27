@@ -98,13 +98,19 @@ export default async function DashboardPage() {
                         <SkillChip key={s.id} name={s.name} />
                       ))}
                     </div>
-                    <div className="mt-5 flex gap-5 font-mono text-xs text-slate-500">
+                    <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-slate-500">
                       <span>
                         <span className="text-slate-200">{o.candidateCount}</span> candidats
                       </span>
                       <span className="text-emerald-400">
                         <span className="font-semibold">{o.strongCount}</span> profils solides
                       </span>
+                      {isRecruiter && o.appliedCount > 0 ? (
+                        <span className="text-amber-300">
+                          <span className="font-semibold">{o.appliedCount}</span> candidature
+                          {o.appliedCount > 1 ? "s" : ""}
+                        </span>
+                      ) : null}
                     </div>
                   </Link>
                 </Reveal>

@@ -48,8 +48,15 @@ function OfferHeader({ offer }: { offer: OfferDetail }) {
   );
 }
 
-export default async function OfferPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function OfferPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ filter?: string }>;
+}) {
   const { id } = await params;
+  const { filter } = await searchParams;
   const user = await getSessionUser();
 
   const offer = await getOfferDetail(id);
@@ -63,7 +70,16 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
   // ─── Vue recruteur propriétaire : classement complet des candidats ───
   if (isOwner) {
     const data = await getOfferWithRanking(id);
-    const matches = data?.matches ?? [];
+    const allMatches = data?.matches ?? [];
+    const appliedMatches = allMatches.filter((m) => m.appliedAt);
+    const onlyApplied = filter === "applied";
+    const matches = onlyApplied ? appliedMatches : allMatches;
+
+    const tab = (active: boolean) =>
+      `rounded-md px-3 py-1.5 font-mono text-xs transition ${
+        active ? "bg-white/10 text-slate-100" : "text-slate-500 hover:text-emerald-300"
+      }`;
+
     return (
       <div className="space-y-8">
         <Link href="/" className="font-mono text-sm text-slate-500 transition hover:text-emerald-300">
@@ -74,13 +90,25 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
         </Reveal>
         <section>
           <Reveal>
-            <div className="mb-5 flex items-baseline justify-between">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <h2 className="font-mono text-sm uppercase tracking-widest text-slate-500">
-                # candidats classés par preuve
+                # {onlyApplied ? "candidatures reçues" : "candidats classés par preuve"}
               </h2>
-              <span className="font-mono text-sm text-slate-600">{matches.length} analysés</span>
+              <div className="flex items-center gap-1 rounded-lg border border-white/10 p-1">
+                <Link href={`/offers/${offer.id}`} className={tab(!onlyApplied)}>
+                  Tous ({allMatches.length})
+                </Link>
+                <Link href={`/offers/${offer.id}?filter=applied`} className={tab(onlyApplied)}>
+                  Candidatures ({appliedMatches.length})
+                </Link>
+              </div>
             </div>
           </Reveal>
+          {matches.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-white/10 p-10 text-center font-mono text-sm text-slate-500">
+              {onlyApplied ? "aucune candidature pour le moment" : "aucun candidat analysé"}
+            </p>
+          ) : null}
           <div className="space-y-5">
             {matches.map((m, i) => (
               <Reveal key={m.id} delay={Math.min(i * 0.05, 0.3)}>

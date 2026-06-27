@@ -13,7 +13,7 @@ export async function getOffersOverview(recruiterId?: string) {
     include: {
       requiredSkills: true,
       recruiter: { select: { company: true, name: true } },
-      matches: { orderBy: { score: "desc" }, select: { score: true } },
+      matches: { orderBy: { score: "desc" }, select: { score: true, appliedAt: true } },
     },
   });
 
@@ -31,6 +31,7 @@ export async function getOffersOverview(recruiterId?: string) {
       candidateCount: scores.length,
       topScore: scores.length > 0 ? scores[0] : null,
       strongCount: scores.filter((s) => s >= 60).length,
+      appliedCount: o.matches.filter((m) => m.appliedAt).length,
     };
   });
 }
@@ -86,6 +87,35 @@ export async function getConversationsForUser(userId: string) {
       candidateUser: { select: { id: true, name: true, email: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 },
     },
+  });
+}
+
+/** Nombre de conversations avec un message non lu (dernier message reçu de l'autre). */
+export async function getUnreadConversationCount(userId: string): Promise<number> {
+  const convos = await prisma.conversation.findMany({
+    where: { OR: [{ recruiterId: userId }, { candidateUserId: userId }] },
+    select: {
+      recruiterId: true,
+      recruiterReadAt: true,
+      candidateReadAt: true,
+      messages: { orderBy: { createdAt: "desc" }, take: 1, select: { senderId: true, createdAt: true } },
+    },
+  });
+  let count = 0;
+  for (const c of convos) {
+    const last = c.messages[0];
+    if (!last || last.senderId === userId) continue;
+    const myReadAt = c.recruiterId === userId ? c.recruiterReadAt : c.candidateReadAt;
+    if (!myReadAt || last.createdAt > myReadAt) count++;
+  }
+  return count;
+}
+
+/** Marque une conversation comme lue par l'utilisateur (côté recruteur ou candidat). */
+export async function markConversationRead(conversationId: string, isRecruiterSide: boolean) {
+  await prisma.conversation.update({
+    where: { id: conversationId },
+    data: isRecruiterSide ? { recruiterReadAt: new Date() } : { candidateReadAt: new Date() },
   });
 }
 

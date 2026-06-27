@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth-helpers";
-import { getConversationForUser } from "@/lib/queries";
+import { getConversationForUser, markConversationRead } from "@/lib/queries";
 import { Avatar } from "@/components/match-ui";
 import { ConversationThread } from "@/components/ConversationThread";
 
@@ -14,6 +14,9 @@ export default async function ConversationPage({
   const user = await requireUser();
   const conversation = await getConversationForUser(id, user.id);
   if (!conversation) notFound();
+
+  // Marque la conversation comme lue par l'utilisateur courant.
+  await markConversationRead(conversation.id, conversation.recruiterId === user.id);
 
   const other =
     conversation.recruiterId === user.id ? conversation.candidateUser : conversation.recruiter;
