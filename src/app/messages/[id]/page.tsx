@@ -20,8 +20,11 @@ export default async function ConversationPage({
   const otherName = other.name ?? other.email ?? "Utilisateur";
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <Link href="/messages" className="font-mono text-sm text-slate-500 transition hover:text-emerald-300">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <Link
+        href="/messages"
+        className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300"
+      >
         ← messages
       </Link>
 
