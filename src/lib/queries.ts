@@ -74,6 +74,39 @@ export async function getApplicationStatus(offerId: string, candidateId: string)
   return m?.appliedAt ?? null;
 }
 
+// ── Messagerie ──────────────────────────────────────────────────────────────
+
+export async function getConversationsForUser(userId: string) {
+  return prisma.conversation.findMany({
+    where: { OR: [{ recruiterId: userId }, { candidateUserId: userId }] },
+    orderBy: { updatedAt: "desc" },
+    include: {
+      offer: { select: { id: true, title: true } },
+      recruiter: { select: { id: true, name: true, email: true } },
+      candidateUser: { select: { id: true, name: true, email: true } },
+      messages: { orderBy: { createdAt: "desc" }, take: 1 },
+    },
+  });
+}
+
+/** Conversation avec contrôle d'accès : null si l'utilisateur n'en fait pas partie. */
+export async function getConversationForUser(id: string, userId: string) {
+  const conversation = await prisma.conversation.findUnique({
+    where: { id },
+    include: {
+      offer: { select: { id: true, title: true } },
+      recruiter: { select: { id: true, name: true, email: true } },
+      candidateUser: { select: { id: true, name: true, email: true } },
+      messages: { orderBy: { createdAt: "asc" } },
+    },
+  });
+  if (!conversation) return null;
+  if (conversation.recruiterId !== userId && conversation.candidateUserId !== userId) {
+    return null;
+  }
+  return conversation;
+}
+
 export async function getCandidates() {
   return prisma.candidate.findMany({
     where: { analysisStatus: "ANALYZED" },

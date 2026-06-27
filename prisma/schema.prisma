@@ -32,6 +32,10 @@ model User {
   sessions  Session[]
   offers    Offer[]
   candidate Candidate?
+
+  sentMessages           Message[]
+  recruiterConversations Conversation[] @relation("RecruiterConversations")
+  candidateConversations Conversation[] @relation("CandidateConversations")
 }
 
 enum Role {
@@ -170,6 +174,7 @@ model Offer {
 
   requiredSkills RequiredSkill[]
   matches        Match[]
+  conversations  Conversation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -235,4 +240,39 @@ model Match {
 
   @@unique([offerId, candidateId])
   @@index([offerId, score])
+}
+
+// ───────────────────────────── Messagerie ────────────────────────────────────
+// Fil de discussion entre un recruteur et un candidat (qui possède un compte),
+// dans le contexte d'une offre. Quasi temps réel via polling côté client.
+
+model Conversation {
+  id              String  @id @default(cuid())
+  offerId         String?
+  offer           Offer?  @relation(fields: [offerId], references: [id], onDelete: SetNull)
+
+  recruiterId     String
+  recruiter       User    @relation("RecruiterConversations", fields: [recruiterId], references: [id], onDelete: Cascade)
+  candidateUserId String
+  candidateUser   User    @relation("CandidateConversations", fields: [candidateUserId], references: [id], onDelete: Cascade)
+
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([offerId, recruiterId, candidateUserId])
+  @@index([recruiterId])
+  @@index([candidateUserId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body           String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
 }

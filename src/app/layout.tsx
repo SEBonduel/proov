@@ -40,6 +40,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               {user?.role === "CANDIDATE" ? (
                 <Link href="/me" className={navLink}>Profil</Link>
               ) : null}
+              {user ? (
+                <Link href="/messages" className={navLink}>Messages</Link>
+              ) : null}
 
               {user ? (
                 <div className="ml-1 flex items-center gap-2 border-l border-white/10 pl-2 sm:ml-2 sm:pl-3">

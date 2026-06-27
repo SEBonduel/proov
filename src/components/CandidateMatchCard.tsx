@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { MatchResult } from "@/lib/matching";
+import { startConversation } from "@/lib/actions";
 import { Avatar, ProofBar } from "@/components/match-ui";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
@@ -13,6 +14,8 @@ interface Props {
   activityScore: number;
   match: MatchResult;
   applied?: boolean;
+  offerId: string;
+  candidateHasAccount?: boolean;
 }
 
 // Carte d'un candidat dans le classement : anneau de score animé, radar de
@@ -26,6 +29,8 @@ export function CandidateMatchCard({
   activityScore,
   match,
   applied,
+  offerId,
+  candidateHasAccount,
 }: Props) {
   const isTop = rank === 1;
   const radarData = match.breakdown.map((b) => ({
@@ -118,6 +123,18 @@ export function CandidateMatchCard({
           <span className="text-slate-400">+ atouts :</span>{" "}
           {match.extraStrengths.slice(0, 6).join(" · ")}
         </p>
+      ) : null}
+
+      {candidateHasAccount ? (
+        <div className="mt-4 flex justify-end">
+          <form action={startConversation}>
+            <input type="hidden" name="offerId" value={offerId} />
+            <input type="hidden" name="candidateId" value={candidateId} />
+            <button className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300">
+              ✉ Contacter
+            </button>
+          </form>
+        </div>
       ) : null}
     </div>
   );

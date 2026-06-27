@@ -93,6 +93,8 @@ export default async function OfferPage({ params }: { params: Promise<{ id: stri
                   activityScore={m.candidate.activityScore}
                   match={m.breakdown as unknown as MatchResult}
                   applied={Boolean(m.appliedAt)}
+                  offerId={offer.id}
+                  candidateHasAccount={Boolean(m.candidate.userId)}
                 />
               </Reveal>
             ))}

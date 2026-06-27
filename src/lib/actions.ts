@@ -150,6 +150,35 @@ export async function loginWithPassword(_prev: AuthState, formData: FormData): P
   }
 }
 
+/** Le recruteur ouvre (ou réutilise) un fil de discussion avec un candidat. */
+export async function startConversation(formData: FormData): Promise<void> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const candidateId = String(formData.get("candidateId") ?? "");
+  const recruiter = await requireRecruiter();
+
+  const candidate = await prisma.candidate.findUnique({ where: { id: candidateId } });
+  // Messagerie possible seulement si le candidat possède un compte.
+  if (!candidate?.userId) redirect(`/offers/${offerId}`);
+
+  const conversation = await prisma.conversation.upsert({
+    where: {
+      offerId_recruiterId_candidateUserId: {
+        offerId,
+        recruiterId: recruiter.id,
+        candidateUserId: candidate!.userId!,
+      },
+    },
+    create: {
+      offerId,
+      recruiterId: recruiter.id,
+      candidateUserId: candidate!.userId!,
+    },
+    update: {},
+  });
+
+  redirect(`/messages/${conversation.id}`);
+}
+
 export type ApplyState = { applied?: boolean; error?: string };
 
 /** Un candidat postule à une offre : on (re)calcule son match et on date la candidature. */
