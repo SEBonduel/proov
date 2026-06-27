@@ -1,65 +1,125 @@
-import Image from "next/image";
+import Link from "next/link";
+import { getOffersOverview } from "@/lib/queries";
+import { getSessionUser } from "@/lib/auth-helpers";
+import { ScoreBadge, SkillChip, contractLabel } from "@/components/match-ui";
+import { Reveal } from "@/components/Reveal";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 
-export default function Home() {
+export default async function DashboardPage() {
+  const user = await getSessionUser();
+  const isRecruiter = user?.role === "RECRUITER" || user?.role === "ADMIN";
+  // Recruteur : ses offres uniquement. Sinon : vitrine publique des offres ouvertes.
+  const offers = await getOffersOverview(isRecruiter ? user!.id : undefined);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="space-y-12">
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 px-8 py-16 sm:px-12 sm:py-20">
+        <AnimatedBackground />
+        <div className="relative">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-xs text-emerald-300">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+            recrutement par la preuve du code
           </p>
+          <h1 className="max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl">
+            La preuve.
+            <br />
+            <span className="text-emerald-400 text-glow">Pas les promesses.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-lg text-slate-400">
+            Proov lit le code GitHub réel des développeurs, en extrait des
+            compétences <span className="text-slate-200">prouvées</span>, et les classe
+            pour vos offres avec un score <span className="text-slate-200">explicable</span>.
+          </p>
+          <div className="mt-8 inline-flex items-center gap-3 rounded-xl border border-white/10 bg-black/40 px-4 py-2.5 font-mono text-sm text-slate-400">
+            <span className="text-emerald-400">$</span>
+            <span>
+              proov match <span className="text-slate-200">--offer</span>{" "}
+              <span className="text-amber-300">&quot;Frontend React&quot;</span>
+            </span>
+            <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-emerald-400/80" />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
+
+      <section>
+        <Reveal>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h2 className="font-mono text-sm uppercase tracking-widest text-slate-500">
+              # {isRecruiter ? "mes offres" : "offres"}{" "}
+              <span className="text-slate-700">({offers.length})</span>
+            </h2>
+            {isRecruiter ? (
+              <Link
+                href="/offers/new"
+                className="rounded-lg bg-emerald-400 px-3.5 py-1.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300"
+              >
+                + Nouvelle offre
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-lg border border-white/10 px-3.5 py-1.5 text-sm text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300"
+              >
+                Publier une offre →
+              </Link>
+            )}
+          </div>
+        </Reveal>
+
+        {offers.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-white/10 p-10 text-center text-sm text-slate-500">
+            {isRecruiter ? (
+              <>
+                <p>Vous n&apos;avez pas encore publié d&apos;offre.</p>
+                <Link
+                  href="/offers/new"
+                  className="mt-4 inline-block rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-emerald-950 transition hover:bg-emerald-300"
+                >
+                  + Publier ma première offre
+                </Link>
+              </>
+            ) : (
+              <p className="font-mono">aucune offre ouverte pour le moment</p>
+            )}
+          </div>
+        ) : (
+          <ul className="grid gap-5 sm:grid-cols-2">
+            {offers.map((o, i) => (
+              <li key={o.id}>
+                <Reveal delay={i * 0.06}>
+                  <Link
+                    href={`/offers/${o.id}`}
+                    className="block h-full rounded-2xl p-6 panel panel-hover"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-semibold leading-snug">{o.title}</h3>
+                      {o.topScore !== null ? <ScoreBadge score={o.topScore} /> : null}
+                    </div>
+                    <p className="mt-1.5 font-mono text-xs text-slate-500">
+                      {contractLabel(o.contractType)}
+                      {o.location ? ` · ${o.location}` : ""}
+                      {o.remote ? " · remote" : ""}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {o.requiredSkills.slice(0, 5).map((s) => (
+                        <SkillChip key={s.id} name={s.name} />
+                      ))}
+                    </div>
+                    <div className="mt-5 flex gap-5 font-mono text-xs text-slate-500">
+                      <span>
+                        <span className="text-slate-200">{o.candidateCount}</span> candidats
+                      </span>
+                      <span className="text-emerald-400">
+                        <span className="font-semibold">{o.strongCount}</span> profils solides
+                      </span>
+                    </div>
+                  </Link>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

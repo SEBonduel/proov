@@ -1,0 +1,238 @@
+// Proov — schéma de données
+// Plateforme de recrutement « par la preuve du code » : un recruteur poste une
+// offre, l'IA classe des candidats dont les compétences sont vérifiées depuis
+// leur GitHub réel, avec un score de matching explicable.
+// Docs schéma : https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────────── Auth (NextAuth / Auth.js) ─────────────────────
+// Le recruteur est l'utilisateur authentifié de la plateforme.
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  company       String?
+  githubLogin   String?   @unique
+  passwordHash  String?
+  role          Role?
+  createdAt     DateTime  @default(now())
+
+  accounts  Account[]
+  sessions  Session[]
+  offers    Offer[]
+  candidate Candidate?
+}
+
+enum Role {
+  CANDIDATE
+  RECRUITER
+  ADMIN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ───────────────────────────── Domaine métier ────────────────────────────────
+
+// Un candidat développeur, sourcé depuis un profil GitHub public.
+model Candidate {
+  id          String   @id @default(cuid())
+  githubLogin String   @unique
+  // Lien optionnel vers le compte utilisateur (si le candidat s'est connecté lui-même)
+  userId      String?  @unique
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name        String?
+  avatarUrl   String?
+  bio         String?
+  location    String?
+  company     String?
+  githubUrl   String
+  blog        String?
+
+  publicRepos Int   @default(0)
+  followers   Int   @default(0)
+
+  // Données GitHub agrégées brutes (transparence + reproductibilité de l'analyse)
+  rawData Json?
+
+  // Synthèse générée par l'IA (mini-pitch du candidat)
+  aiSummary String?
+
+  // Score d'activité récente 0–100 (fraîcheur des contributions)
+  activityScore Int @default(0)
+
+  // Statut de l'analyse : en attente / en cours / analysé / échec
+  analysisStatus AnalysisStatus @default(PENDING)
+  fetchedAt      DateTime?
+  analyzedAt     DateTime?
+
+  skills  CandidateSkill[]
+  matches Match[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AnalysisStatus {
+  PENDING
+  FETCHING
+  ANALYZING
+  ANALYZED
+  FAILED
+}
+
+// Une compétence d'un candidat, VÉRIFIÉE depuis son code (pas déclarée).
+model CandidateSkill {
+  id          String       @id @default(cuid())
+  candidateId String
+  candidate   Candidate    @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  name     String // normalisé, ex. "React", "PostgreSQL", "Docker"
+  category SkillCategory
+
+  // Force de la preuve 0–100 : combien le code atteste réellement cette compétence
+  proofStrength Int
+  // Récence d'usage, en mois depuis la dernière utilisation observée
+  recencyMonths Int @default(0)
+
+  // Repos qui prouvent la compétence (URLs) + justification lisible par un humain
+  evidenceRepos String[]
+  reasoning     String?
+
+  @@unique([candidateId, name])
+  @@index([name])
+}
+
+enum SkillCategory {
+  LANGUAGE
+  FRAMEWORK
+  TOOL
+  DATABASE
+  DOMAIN
+}
+
+// Une offre d'alternance/mission publiée par un recruteur.
+model Offer {
+  id           String       @id @default(cuid())
+  recruiterId  String
+  recruiter    User         @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+
+  title        String
+  description  String
+  location     String?
+  remote       Boolean      @default(false)
+  contractType ContractType @default(ALTERNANCE)
+  seniority    Seniority    @default(JUNIOR)
+  status       OfferStatus  @default(OPEN)
+
+  requiredSkills RequiredSkill[]
+  matches        Match[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ContractType {
+  ALTERNANCE
+  STAGE
+  CDI
+  CDD
+  FREELANCE
+}
+
+enum Seniority {
+  INTERN
+  JUNIOR
+  MID
+  SENIOR
+}
+
+enum OfferStatus {
+  OPEN
+  CLOSED
+}
+
+// Une compétence requise par une offre, avec son importance.
+model RequiredSkill {
+  id      String @id @default(cuid())
+  offerId String
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
+  name     String
+  weight   Int     @default(3) // importance 1–5
+  mustHave Boolean @default(false)
+
+  @@unique([offerId, name])
+}
+
+// Résultat de matching candidat ↔ offre (calculé, mis en cache).
+model Match {
+  id          String    @id @default(cuid())
+  offerId     String
+  offer       Offer     @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  // Score global 0–100
+  score Int
+
+  // Décomposition explicable du score (par compétence requise : couverte ou non,
+  // force de preuve, contribution au score…)
+  breakdown Json
+
+  // Explication en langage naturel (générée par l'IA, optionnelle)
+  explanation String?
+
+  shortlisted Boolean   @default(false)
+  // Renseigné quand le candidat postule explicitement à l'offre.
+  appliedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([offerId, candidateId])
+  @@index([offerId, score])
+}
