@@ -20,6 +20,7 @@ const navLink =
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
   const user = session?.user ?? null;
+  const isRecruiter = user?.role === "RECRUITER" || user?.role === "ADMIN";
 
   return (
     <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
@@ -40,7 +41,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
             <nav className="flex items-center gap-1 font-mono text-sm">
               <Link href="/" className={navLink}>Offres</Link>
-              <Link href="/candidates" className={navLink}>Candidats</Link>
+              {isRecruiter ? (
+                <Link href="/candidates" className={navLink}>Candidats</Link>
+              ) : null}
               {user?.role === "CANDIDATE" ? (
                 <Link href="/me" className={navLink}>Mon profil</Link>
               ) : null}

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { getCandidates } from "@/lib/queries";
+import { requireRecruiter } from "@/lib/auth-helpers";
 import { Avatar, SkillChip } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 
 export default async function CandidatesPage() {
+  await requireRecruiter();
   const candidates = await getCandidates();
 
   return (

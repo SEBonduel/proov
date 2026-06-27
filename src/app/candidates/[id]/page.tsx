@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getCandidate } from "@/lib/queries";
+import { requireUser } from "@/lib/auth-helpers";
 import { Avatar, ProofBar, categoryLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 
@@ -12,8 +13,14 @@ export default async function CandidatePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const user = await requireUser();
   const candidate = await getCandidate(id);
   if (!candidate) notFound();
+
+  // Accès réservé : un recruteur peut voir n'importe quel profil ; un candidat
+  // ne peut voir que le sien.
+  const isRecruiter = user.role === "RECRUITER" || user.role === "ADMIN";
+  if (!isRecruiter && candidate.userId !== user.id) redirect("/");
 
   const byCategory = CATEGORY_ORDER.map((cat) => ({
     category: cat,
