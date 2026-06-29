@@ -9,6 +9,7 @@ import {
 import { getSessionUser } from "@/lib/auth-helpers";
 import { computeMatch, type MatchResult } from "@/lib/matching";
 import { CandidateMatchCard } from "@/components/CandidateMatchCard";
+import { CandidateCompare } from "@/components/CandidateCompare";
 import { ApplyButton } from "@/components/ApplyButton";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
@@ -88,6 +89,24 @@ export default async function OfferPage({
         <Reveal>
           <OfferHeader offer={offer} />
         </Reveal>
+
+        {allMatches.length >= 2 ? (
+          <Reveal delay={0.05}>
+            <CandidateCompare
+              axes={(allMatches[0].breakdown as unknown as MatchResult).breakdown.map((b) => b.name)}
+              candidates={allMatches.map((m) => {
+                const br = m.breakdown as unknown as MatchResult;
+                return {
+                  id: m.candidate.id,
+                  name: m.candidate.name ?? m.candidate.githubLogin,
+                  score: m.score,
+                  values: br.breakdown.map((b) => (b.status === "missing" ? 0 : b.skillScore)),
+                };
+              })}
+            />
+          </Reveal>
+        ) : null}
+
         <section>
           <Reveal>
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">

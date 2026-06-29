@@ -4,6 +4,7 @@ import { getCandidate } from "@/lib/queries";
 import { requireUser } from "@/lib/auth-helpers";
 import { Avatar, ProofBar, categoryLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
+import { LanguageBar } from "@/components/LanguageBar";
 
 const CATEGORY_ORDER = ["LANGUAGE", "FRAMEWORK", "DATABASE", "TOOL", "DOMAIN"];
 
@@ -26,6 +27,9 @@ export default async function CandidatePage({
     category: cat,
     skills: candidate.skills.filter((s) => s.category === cat),
   })).filter((g) => g.skills.length > 0);
+
+  const languages =
+    (candidate.rawData as { languageTotals?: Record<string, number> } | null)?.languageTotals ?? {};
 
   return (
     <div className="space-y-8">
@@ -67,6 +71,17 @@ export default async function CandidatePage({
               ◆ synthèse
             </h2>
             <p className="mt-2 text-slate-200">{candidate.aiSummary}</p>
+          </section>
+        </Reveal>
+      ) : null}
+
+      {Object.keys(languages).length > 0 ? (
+        <Reveal delay={0.08}>
+          <section className="rounded-2xl p-6 panel">
+            <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-500">
+              répartition des langages
+            </h2>
+            <LanguageBar languages={languages} />
           </section>
         </Reveal>
       ) : null}

@@ -5,6 +5,8 @@ import { auth, signOut } from "@/auth";
 import { getUnreadConversationCount } from "@/lib/queries";
 import { Avatar } from "@/components/match-ui";
 import { Logo } from "@/components/Logo";
+import { CommandPalette } from "@/components/CommandPalette";
+import { PaletteTrigger } from "@/components/PaletteTrigger";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -35,6 +37,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </Link>
 
             <nav className="flex items-center gap-0.5 font-mono text-sm sm:gap-1">
+              <PaletteTrigger />
               <Link href="/" className={navLink}>Offres</Link>
               {isRecruiter ? (
                 <Link href="/candidates" className={navLink}>Candidats</Link>
@@ -96,6 +99,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
         </header>
 
+        <CommandPalette />
         <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
 
         <footer className="border-t border-white/10">
