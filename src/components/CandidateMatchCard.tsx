@@ -4,6 +4,7 @@ import { startConversation } from "@/lib/actions";
 import { Avatar, ProofBar } from "@/components/match-ui";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
+import { ExplainButton } from "@/components/ExplainButton";
 
 interface Props {
   rank: number;
@@ -16,6 +17,7 @@ interface Props {
   applied?: boolean;
   offerId: string;
   candidateHasAccount?: boolean;
+  explanation?: string | null;
 }
 
 // Carte d'un candidat dans le classement : anneau de score animé, radar de
@@ -31,6 +33,7 @@ export function CandidateMatchCard({
   applied,
   offerId,
   candidateHasAccount,
+  explanation,
 }: Props) {
   const isTop = rank === 1;
   const radarData = match.breakdown.map((b) => ({
@@ -124,6 +127,10 @@ export function CandidateMatchCard({
           {match.extraStrengths.slice(0, 6).join(" · ")}
         </p>
       ) : null}
+
+      <div className="mt-4">
+        <ExplainButton offerId={offerId} candidateId={candidateId} initial={explanation} />
+      </div>
 
       {candidateHasAccount ? (
         <div className="mt-4 flex justify-end">

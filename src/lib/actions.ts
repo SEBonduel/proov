@@ -7,7 +7,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/auth";
 import { recomputeMatchesForOffer } from "@/lib/matches";
-import { computeMatch } from "@/lib/matching";
+import { computeMatch, type MatchResult } from "@/lib/matching";
+import { generateMatchExplanation } from "@/lib/ai/explain";
 import { ingestGitHubUser } from "@/lib/candidates";
 import { requireUser, requireRecruiter } from "@/lib/auth-helpers";
 import type { Prisma } from "@/generated/prisma/client";
@@ -177,6 +178,38 @@ export async function startConversation(formData: FormData): Promise<void> {
   });
 
   redirect(`/messages/${conversation.id}`);
+}
+
+export type ExplainState = { explanation?: string; error?: string };
+
+/** Génère (et met en cache) l'explication IA d'un match. Recruteur propriétaire uniquement. */
+export async function explainMatch(_prev: ExplainState, formData: FormData): Promise<ExplainState> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const candidateId = String(formData.get("candidateId") ?? "");
+  const recruiter = await requireRecruiter();
+
+  const offer = await prisma.offer.findUnique({
+    where: { id: offerId },
+    select: { recruiterId: true, title: true },
+  });
+  if (!offer || offer.recruiterId !== recruiter.id) return { error: "Accès refusé." };
+
+  const match = await prisma.match.findUnique({
+    where: { offerId_candidateId: { offerId, candidateId } },
+    include: { candidate: { select: { name: true, githubLogin: true } } },
+  });
+  if (!match) return { error: "Match introuvable." };
+  if (match.explanation) return { explanation: match.explanation };
+
+  const explanation = await generateMatchExplanation({
+    candidateName: match.candidate.name ?? match.candidate.githubLogin,
+    offerTitle: offer.title,
+    match: match.breakdown as unknown as MatchResult,
+  });
+
+  await prisma.match.update({ where: { id: match.id }, data: { explanation } });
+  revalidatePath(`/offers/${offerId}`);
+  return { explanation };
 }
 
 export type ApplyState = { applied?: boolean; error?: string };

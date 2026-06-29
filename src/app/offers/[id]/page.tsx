@@ -123,6 +123,7 @@ export default async function OfferPage({
                   applied={Boolean(m.appliedAt)}
                   offerId={offer.id}
                   candidateHasAccount={Boolean(m.candidate.userId)}
+                  explanation={m.explanation}
                 />
               </Reveal>
             ))}
