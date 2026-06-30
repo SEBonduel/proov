@@ -100,6 +100,48 @@ export async function createOffer(
   redirect(`/offers/${offer.id}`);
 }
 
+export type LinkState = { error?: string };
+
+const GH_USERNAME = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
+
+/**
+ * Relie un compte candidat (créé par email/mot de passe) à un profil GitHub :
+ * ingère et analyse le profil public, puis lie le candidat au compte.
+ */
+export async function linkGitHub(_prev: LinkState, formData: FormData): Promise<LinkState> {
+  const user = await requireUser();
+  if (user.role !== "CANDIDATE") return { error: "Réservé aux candidats." };
+
+  // Accepte un pseudo, un @handle ou une URL github.com/xxx.
+  const login = String(formData.get("githubLogin") ?? "")
+    .trim()
+    .replace(/^@/, "")
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/\/.*$/, "")
+    .trim();
+  if (!GH_USERNAME.test(login)) return { error: "Nom d'utilisateur GitHub invalide." };
+
+  const otherUser = await prisma.user.findUnique({ where: { githubLogin: login } });
+  if (otherUser && otherUser.id !== user.id)
+    return { error: "Ce GitHub est déjà lié à un autre compte." };
+  const otherCandidate = await prisma.candidate.findUnique({ where: { githubLogin: login } });
+  if (otherCandidate?.userId && otherCandidate.userId !== user.id)
+    return { error: "Ce profil GitHub est déjà associé à un autre compte." };
+
+  let candidateId: string;
+  try {
+    candidateId = await ingestGitHubUser(login);
+  } catch {
+    return { error: "Profil GitHub introuvable ou injoignable. Vérifiez le pseudo." };
+  }
+
+  await prisma.user.update({ where: { id: user.id }, data: { githubLogin: login } }).catch(() => {});
+  await prisma.candidate.update({ where: { id: candidateId }, data: { userId: user.id } });
+
+  revalidatePath("/me");
+  redirect("/me");
+}
+
 export type AuthState = { error?: string };
 
 const credentialsSchema = z.object({
