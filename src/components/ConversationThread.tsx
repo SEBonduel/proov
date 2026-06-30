@@ -135,9 +135,15 @@ export function ConversationThread({
         <button
           type="submit"
           disabled={sending || !input.trim()}
-          className="rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:opacity-50"
         >
-          Envoyer
+          {sending ? (
+            <>
+              <Spinner className="h-3.5 w-3.5" /> Envoi…
+            </>
+          ) : (
+            "Envoyer"
+          )}
         </button>
       </form>
     </div>

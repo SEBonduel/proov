@@ -13,6 +13,7 @@ import { CandidateMatchCard } from "@/components/CandidateMatchCard";
 import { OfferTabs } from "@/components/OfferTabs";
 import { CandidateCompare } from "@/components/CandidateCompare";
 import { ApplyButton } from "@/components/ApplyButton";
+import { SubmitButton } from "@/components/SubmitButton";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
 import { ProofBar, SkillChip, StatusBadge, contractLabel } from "@/components/match-ui";
@@ -115,21 +116,21 @@ export default async function OfferPage({
             </Link>
             <form action={toggleOfferStatus}>
               <input type="hidden" name="offerId" value={offer.id} />
-              <button
-                type="submit"
-                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-amber-400/40 hover:text-amber-300"
+              <SubmitButton
+                pendingText={offer.status === "OPEN" ? "Fermeture…" : "Réouverture…"}
+                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-amber-400/40 hover:text-amber-300 disabled:opacity-60"
               >
                 {offer.status === "OPEN" ? "Fermer l'offre" : "Rouvrir l'offre"}
-              </button>
+              </SubmitButton>
             </form>
             <form action={duplicateOffer}>
               <input type="hidden" name="offerId" value={offer.id} />
-              <button
-                type="submit"
-                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300"
+              <SubmitButton
+                pendingText="Duplication…"
+                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300 disabled:opacity-60"
               >
                 Dupliquer
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </Reveal>
