@@ -170,6 +170,90 @@ export async function getRecruiterProfile(id: string) {
   return { recruiter, offers };
 }
 
+/**
+ * Statistiques agrégées d'un recruteur pour son tableau de bord :
+ * volume d'offres, pipeline de candidatures, qualité des matchs, compétences
+ * les plus demandées et répartition des scores.
+ */
+export async function getRecruiterStats(recruiterId: string) {
+  const offers = await prisma.offer.findMany({
+    where: { recruiterId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      requiredSkills: { select: { name: true } },
+      matches: { select: { score: true, appliedAt: true, status: true } },
+    },
+  });
+
+  const openOffers = offers.filter((o) => o.status === "OPEN").length;
+  const closedOffers = offers.length - openOffers;
+
+  const allMatches = offers.flatMap((o) => o.matches);
+  const applications = allMatches.filter((m) => m.appliedAt);
+
+  // Pipeline des candidatures par statut.
+  const pipeline = { NEW: 0, SHORTLISTED: 0, REJECTED: 0 };
+  for (const m of applications) {
+    pipeline[m.status as keyof typeof pipeline] =
+      (pipeline[m.status as keyof typeof pipeline] ?? 0) + 1;
+  }
+
+  // Répartition des scores de matching (tous candidats classés).
+  const scoreBuckets = [
+    { label: "0–39", min: 0, max: 39, count: 0 },
+    { label: "40–59", min: 40, max: 59, count: 0 },
+    { label: "60–79", min: 60, max: 79, count: 0 },
+    { label: "80–100", min: 80, max: 100, count: 0 },
+  ];
+  for (const m of allMatches) {
+    const b = scoreBuckets.find((x) => m.score >= x.min && m.score <= x.max);
+    if (b) b.count += 1;
+  }
+
+  // Compétences les plus demandées sur l'ensemble de ses offres.
+  const skillCounts = new Map<string, number>();
+  for (const o of offers) {
+    for (const s of o.requiredSkills) {
+      skillCounts.set(s.name, (skillCounts.get(s.name) ?? 0) + 1);
+    }
+  }
+  const topSkills = [...skillCounts.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8);
+
+  // Candidatures par offre (les plus actives en premier).
+  const perOffer = offers
+    .map((o) => ({
+      id: o.id,
+      title: o.title,
+      status: o.status,
+      candidateCount: o.matches.length,
+      appliedCount: o.matches.filter((m) => m.appliedAt).length,
+      topScore: o.matches.reduce((max, m) => Math.max(max, m.score), 0),
+    }))
+    .sort((a, b) => b.appliedCount - a.appliedCount || b.candidateCount - a.candidateCount);
+
+  const scored = allMatches.map((m) => m.score);
+  const avgScore =
+    scored.length > 0 ? Math.round(scored.reduce((a, b) => a + b, 0) / scored.length) : 0;
+
+  return {
+    offerCount: offers.length,
+    openOffers,
+    closedOffers,
+    candidateCount: allMatches.length,
+    applicationCount: applications.length,
+    shortlistedCount: pipeline.SHORTLISTED,
+    avgScore,
+    strongCount: scored.filter((s) => s >= 60).length,
+    pipeline,
+    scoreBuckets,
+    topSkills,
+    perOffer,
+  };
+}
+
 export async function getCandidates() {
   return prisma.candidate.findMany({
     where: { analysisStatus: "ANALYZED" },
