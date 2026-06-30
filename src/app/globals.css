@@ -83,3 +83,18 @@ body {
     font-family: var(--font-mono), ui-monospace, monospace;
   }
 }
+
+@layer base {
+  /* Tailwind v4 ne met plus cursor:pointer par défaut sur les boutons. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary,
+  a[href] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
