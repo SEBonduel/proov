@@ -194,6 +194,44 @@ export async function getCandidateByUserId(userId: string) {
 
 type CandidateSkillRow = { name: string; proofStrength: number; recencyMonths: number; evidenceRepos: string[] };
 
+/**
+ * Analyse d'écart de compétences : pour les offres ouvertes, quelles compétences
+ * requises le candidat ne prouve pas (et combien d'offres chacune débloquerait).
+ */
+export async function getSkillGapForCandidate(skills: CandidateSkillRow[]) {
+  const offers = await prisma.offer.findMany({
+    where: { status: "OPEN" },
+    include: { requiredSkills: true },
+  });
+  const candidateSkills = skills.map((s) => ({
+    name: s.name,
+    proofStrength: s.proofStrength,
+    recencyMonths: s.recencyMonths,
+    evidenceRepos: s.evidenceRepos,
+  }));
+
+  const gap = new Map<string, { offers: number; mustHave: number }>();
+  for (const offer of offers) {
+    const result = computeMatch(
+      candidateSkills,
+      offer.requiredSkills.map((r) => ({ name: r.name, weight: r.weight, mustHave: r.mustHave })),
+    );
+    for (const b of result.breakdown) {
+      if (b.status === "missing") {
+        const cur = gap.get(b.name) ?? { offers: 0, mustHave: 0 };
+        cur.offers += 1;
+        if (b.mustHave) cur.mustHave += 1;
+        gap.set(b.name, cur);
+      }
+    }
+  }
+
+  return [...gap.entries()]
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.offers - a.offers || b.mustHave - a.mustHave)
+    .slice(0, 6);
+}
+
 /** Classe les offres ouvertes selon leur adéquation avec un candidat (calcul live). */
 export async function getOffersRankedForCandidate(skills: CandidateSkillRow[]) {
   const offers = await prisma.offer.findMany({

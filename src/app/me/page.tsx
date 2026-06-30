@@ -5,7 +5,9 @@ import {
   getCandidateByUserId,
   getOffersRankedForCandidate,
   getCandidateApplications,
+  getSkillGapForCandidate,
 } from "@/lib/queries";
+import { CoachButton } from "@/components/CoachButton";
 import {
   Avatar,
   ProofBar,
@@ -49,6 +51,7 @@ export default async function MePage() {
 
   const ranked = await getOffersRankedForCandidate(candidate.skills);
   const applications = await getCandidateApplications(candidate.id);
+  const gap = await getSkillGapForCandidate(candidate.skills);
   const topSkills = candidate.skills.slice(0, 8);
 
   return (
@@ -90,6 +93,41 @@ export default async function MePage() {
               </div>
             ))}
           </div>
+        </section>
+      </Reveal>
+
+      <Reveal delay={0.05}>
+        <section className="rounded-2xl p-6 panel">
+          <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-slate-500">
+            coaching — compétences à acquérir
+          </h2>
+          {gap.length > 0 ? (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {gap.map((g) => (
+                  <span
+                    key={g.name}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1 text-sm ring-1 ring-white/10"
+                  >
+                    {g.name}
+                    <span className="font-mono text-[11px] text-emerald-300">
+                      +{g.offers} offre{g.offers > 1 ? "s" : ""}
+                    </span>
+                  </span>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-slate-500">
+                Acquérir ces compétences — et les prouver par du code — débloquerait davantage d'offres.
+              </p>
+              <div className="mt-4">
+                <CoachButton />
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-slate-400">
+              Vous couvrez déjà les compétences requises par les offres ouvertes 🎉
+            </p>
+          )}
         </section>
       </Reveal>
 

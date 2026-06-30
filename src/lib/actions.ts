@@ -9,6 +9,8 @@ import { signIn } from "@/auth";
 import { recomputeMatchesForOffer } from "@/lib/matches";
 import { computeMatch, type MatchResult } from "@/lib/matching";
 import { generateMatchExplanation } from "@/lib/ai/explain";
+import { generateCoaching } from "@/lib/ai/coach";
+import { getSkillGapForCandidate } from "@/lib/queries";
 import { ingestGitHubUser } from "@/lib/candidates";
 import { requireUser, requireRecruiter } from "@/lib/auth-helpers";
 import type { Prisma } from "@/generated/prisma/client";
@@ -281,6 +283,27 @@ export async function startConversation(formData: FormData): Promise<void> {
   });
 
   redirect(`/messages/${conversation.id}`);
+}
+
+export type CoachState = { coaching?: string; error?: string };
+
+/** Génère des conseils IA personnalisés pour le candidat (compétences à acquérir). */
+export async function coachMe(_prev: CoachState, _formData: FormData): Promise<CoachState> {
+  const user = await requireUser();
+  if (user.role !== "CANDIDATE") return { error: "Réservé aux candidats." };
+  const candidate = await prisma.candidate.findUnique({
+    where: { userId: user.id },
+    include: { skills: { orderBy: { proofStrength: "desc" } } },
+  });
+  if (!candidate) return { error: "Profil candidat introuvable." };
+
+  const gap = await getSkillGapForCandidate(candidate.skills);
+  const coaching = await generateCoaching({
+    candidateName: candidate.name ?? candidate.githubLogin,
+    topSkills: candidate.skills.slice(0, 6).map((s) => s.name),
+    gap,
+  });
+  return { coaching };
 }
 
 export type ExplainState = { explanation?: string; error?: string };
