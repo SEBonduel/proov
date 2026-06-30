@@ -54,13 +54,13 @@ export function ScoreRing({
           style={{ filter: `drop-shadow(0 0 6px ${color}aa)` }}
         />
       </svg>
-      <div className="absolute inset-0 grid place-items-center text-center leading-none">
-        <div>
+      <div className="absolute inset-0 grid place-items-center px-2 text-center leading-none">
+        <div className="w-full">
           <span className="font-mono text-lg font-bold tabular-nums" style={{ color }}>
             {value}
           </span>
           {label ? (
-            <div className="mt-0.5 font-mono text-[9px] uppercase tracking-wider text-slate-500">
+            <div className="mt-0.5 w-full truncate font-mono text-[7px] font-medium uppercase tracking-tight text-slate-500">
               {label}
             </div>
           ) : null}

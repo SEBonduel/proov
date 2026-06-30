@@ -14,7 +14,17 @@ const POLL_MS = 3000;
 
 function timeOf(iso: string): string {
   const d = new Date(iso);
-  return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  // Aujourd'hui : juste l'heure ; sinon : date + heure.
+  const today = new Date();
+  const sameDay =
+    d.getDate() === today.getDate() &&
+    d.getMonth() === today.getMonth() &&
+    d.getFullYear() === today.getFullYear();
+  return d.toLocaleString("fr-FR", {
+    ...(sameDay ? {} : { day: "numeric", month: "short" }),
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function ConversationThread({
