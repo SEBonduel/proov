@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { Spinner } from "@/components/Spinner";
 
 interface Message {
   id: string;
@@ -24,6 +25,7 @@ export function ConversationThread({
   currentUserId: string;
 }) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -42,6 +44,8 @@ export function ConversationThread({
       );
     } catch {
       // réseau : on réessaiera au prochain tick
+    } finally {
+      setLoaded(true);
     }
   }, [url]);
 
@@ -78,7 +82,11 @@ export function ConversationThread({
   return (
     <div className="flex h-[60vh] flex-col rounded-2xl panel">
       <div className="flex-1 space-y-3 overflow-y-auto p-5">
-        {messages.length === 0 ? (
+        {!loaded ? (
+          <div className="flex h-full items-center justify-center gap-2 font-mono text-xs text-slate-500">
+            <Spinner className="h-5 w-5" /> Chargement des messages…
+          </div>
+        ) : messages.length === 0 ? (
           <p className="py-10 text-center font-mono text-xs text-slate-600">
             Aucun message. Démarrez la conversation 👋
           </p>
