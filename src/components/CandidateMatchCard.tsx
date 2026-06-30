@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { MatchResult } from "@/lib/matching";
-import { startConversation, setMatchStatus } from "@/lib/actions";
+import { startConversation } from "@/lib/actions";
 import { Avatar, ProofBar, StatusBadge } from "@/components/match-ui";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
 import { ExplainButton } from "@/components/ExplainButton";
+import { MatchStatusControl } from "@/components/MatchStatusControl";
 import { SubmitButton } from "@/components/SubmitButton";
 
 interface Props {
@@ -38,10 +39,6 @@ export function CandidateMatchCard({
   explanation,
   status = "NEW",
 }: Props) {
-  const statusBtn = (value: string, activeClass: string) =>
-    `rounded-md px-2 py-1 font-mono text-[10px] transition ${
-      status === value ? activeClass : "text-slate-500 hover:bg-white/5 hover:text-slate-300"
-    }`;
   const isTop = rank === 1;
   const radarData = match.breakdown.map((b) => ({
     label: b.name,
@@ -141,20 +138,7 @@ export function CandidateMatchCard({
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <form action={setMatchStatus} className="flex items-center gap-1">
-          <input type="hidden" name="offerId" value={offerId} />
-          <input type="hidden" name="candidateId" value={candidateId} />
-          <span className="mr-1 font-mono text-[10px] uppercase tracking-wider text-slate-600">statut</span>
-          <button name="status" value="SHORTLISTED" className={statusBtn("SHORTLISTED", "bg-emerald-400/15 text-emerald-300")}>
-            Shortlister
-          </button>
-          <button name="status" value="NEW" className={statusBtn("NEW", "bg-white/10 text-slate-200")}>
-            Nouveau
-          </button>
-          <button name="status" value="REJECTED" className={statusBtn("REJECTED", "bg-rose-400/15 text-rose-300")}>
-            Écarter
-          </button>
-        </form>
+        <MatchStatusControl offerId={offerId} candidateId={candidateId} status={status} />
 
         {candidateHasAccount ? (
           <form action={startConversation}>
