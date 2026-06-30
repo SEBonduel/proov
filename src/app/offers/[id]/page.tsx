@@ -10,6 +10,7 @@ import { getSessionUser } from "@/lib/auth-helpers";
 import { toggleOfferStatus, duplicateOffer } from "@/lib/actions";
 import { computeMatch, type MatchResult } from "@/lib/matching";
 import { CandidateMatchCard } from "@/components/CandidateMatchCard";
+import { OfferTabs } from "@/components/OfferTabs";
 import { CandidateCompare } from "@/components/CandidateCompare";
 import { ApplyButton } from "@/components/ApplyButton";
 import { ScoreRing } from "@/components/ScoreRing";
@@ -84,11 +85,6 @@ export default async function OfferPage({
     const onlyApplied = filter === "applied";
     const matches = onlyApplied ? appliedMatches : allMatches;
 
-    const tab = (active: boolean) =>
-      `rounded-md px-3 py-1.5 font-mono text-xs transition ${
-        active ? "bg-white/10 text-slate-100" : "text-slate-500 hover:text-emerald-300"
-      }`;
-
     return (
       <div className="space-y-10">
         <Link href="/" className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300">
@@ -161,14 +157,12 @@ export default async function OfferPage({
               <h2 className="font-mono text-sm uppercase tracking-widest text-slate-500">
                 # {onlyApplied ? "candidatures reçues" : "candidats classés par preuve"}
               </h2>
-              <div className="flex items-center gap-1 rounded-lg border border-white/10 p-1">
-                <Link href={`/offers/${offer.id}`} className={tab(!onlyApplied)}>
-                  Tous ({allMatches.length})
-                </Link>
-                <Link href={`/offers/${offer.id}?filter=applied`} className={tab(onlyApplied)}>
-                  Candidatures ({appliedMatches.length})
-                </Link>
-              </div>
+              <OfferTabs
+                offerId={offer.id}
+                allCount={allMatches.length}
+                appliedCount={appliedMatches.length}
+                onlyApplied={onlyApplied}
+              />
             </div>
           </Reveal>
           {matches.length === 0 ? (
