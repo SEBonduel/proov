@@ -32,12 +32,12 @@ export default async function CandidatePage({
     (candidate.rawData as { languageTotals?: Record<string, number> } | null)?.languageTotals ?? {};
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <Link
         href="/candidates"
-        className="font-mono text-sm text-slate-500 transition hover:text-emerald-300"
+        className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300"
       >
-        ← candidats
+        ← Candidats
       </Link>
 
       <Reveal>

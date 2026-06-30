@@ -13,7 +13,7 @@ import { CandidateCompare } from "@/components/CandidateCompare";
 import { ApplyButton } from "@/components/ApplyButton";
 import { ScoreRing } from "@/components/ScoreRing";
 import { SkillRadar } from "@/components/SkillRadar";
-import { ProofBar, SkillChip, contractLabel } from "@/components/match-ui";
+import { ProofBar, SkillChip, StatusBadge, contractLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 
 type OfferDetail = NonNullable<Awaited<ReturnType<typeof getOfferDetail>>>;
@@ -89,9 +89,9 @@ export default async function OfferPage({
       }`;
 
     return (
-      <div className="space-y-8">
-        <Link href="/" className="font-mono text-sm text-slate-500 transition hover:text-emerald-300">
-          ← mes offres
+      <div className="space-y-10">
+        <Link href="/" className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300">
+          ← Mes offres
         </Link>
         <Reveal>
           <OfferHeader offer={offer} />
@@ -150,6 +150,7 @@ export default async function OfferPage({
                   offerId={offer.id}
                   candidateHasAccount={Boolean(m.candidate.userId)}
                   explanation={m.explanation}
+                  status={m.status}
                 />
               </Reveal>
             ))}
@@ -165,6 +166,7 @@ export default async function OfferPage({
 
   let myMatch: MatchResult | null = null;
   let appliedAt: Date | null = null;
+  let appStatus: string | null = null;
   if (candidate) {
     myMatch = computeMatch(
       candidate.skills.map((s) => ({
@@ -175,13 +177,15 @@ export default async function OfferPage({
       })),
       offer.requiredSkills.map((r) => ({ name: r.name, weight: r.weight, mustHave: r.mustHave })),
     );
-    appliedAt = await getApplicationStatus(id, candidate.id);
+    const application = await getApplicationStatus(id, candidate.id);
+    appliedAt = application?.appliedAt ?? null;
+    appStatus = application?.status ?? null;
   }
 
   return (
-    <div className="space-y-8">
-      <Link href="/" className="font-mono text-sm text-slate-500 transition hover:text-emerald-300">
-        ← offres
+    <div className="space-y-10">
+      <Link href="/" className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300">
+        ← Offres
       </Link>
       <Reveal>
         <OfferHeader offer={offer} />
@@ -198,6 +202,11 @@ export default async function OfferPage({
                 <p className="mt-1 text-sm text-slate-400">
                   Calculée à partir de vos compétences prouvées.
                 </p>
+                {appliedAt && appStatus ? (
+                  <p className="mt-2 flex items-center gap-2 font-mono text-xs text-slate-500">
+                    candidature : <StatusBadge status={appStatus} />
+                  </p>
+                ) : null}
               </div>
               <ScoreRing value={myMatch.score} label={myMatch.label} size={84} />
             </div>

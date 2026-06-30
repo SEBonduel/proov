@@ -12,12 +12,12 @@ export default async function EditRecruiterProfilePage() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-8">
       <Link
         href={`/recruiters/${user.id}`}
         className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300"
       >
-        ← mon profil
+        ← Mon profil
       </Link>
       <Reveal>
         <h1 className="text-2xl font-bold sm:text-3xl">Éditer mon profil</h1>

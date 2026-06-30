@@ -233,6 +233,27 @@ export async function loginWithPassword(_prev: AuthState, formData: FormData): P
   }
 }
 
+/** Le recruteur change le statut d'un candidat (pipeline) sur son offre. */
+export async function setMatchStatus(formData: FormData): Promise<void> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const candidateId = String(formData.get("candidateId") ?? "");
+  const status = String(formData.get("status") ?? "");
+  if (!["NEW", "SHORTLISTED", "REJECTED"].includes(status)) return;
+
+  const recruiter = await requireRecruiter();
+  const offer = await prisma.offer.findUnique({
+    where: { id: offerId },
+    select: { recruiterId: true },
+  });
+  if (!offer || offer.recruiterId !== recruiter.id) return;
+
+  await prisma.match.update({
+    where: { offerId_candidateId: { offerId, candidateId } },
+    data: { status: status as "NEW" | "SHORTLISTED" | "REJECTED" },
+  });
+  revalidatePath(`/offers/${offerId}`);
+}
+
 /** Le recruteur ouvre (ou réutilise) un fil de discussion avec un candidat. */
 export async function startConversation(formData: FormData): Promise<void> {
   const offerId = String(formData.get("offerId") ?? "");

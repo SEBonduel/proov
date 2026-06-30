@@ -1,8 +1,19 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth-helpers";
-import { getCandidateByUserId, getOffersRankedForCandidate } from "@/lib/queries";
-import { Avatar, ProofBar, ScoreBadge, SkillChip, contractLabel } from "@/components/match-ui";
+import {
+  getCandidateByUserId,
+  getOffersRankedForCandidate,
+  getCandidateApplications,
+} from "@/lib/queries";
+import {
+  Avatar,
+  ProofBar,
+  ScoreBadge,
+  SkillChip,
+  StatusBadge,
+  contractLabel,
+} from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 import { LinkGitHubForm } from "@/components/LinkGitHubForm";
 
@@ -37,6 +48,7 @@ export default async function MePage() {
   }
 
   const ranked = await getOffersRankedForCandidate(candidate.skills);
+  const applications = await getCandidateApplications(candidate.id);
   const topSkills = candidate.skills.slice(0, 8);
 
   return (
@@ -106,6 +118,11 @@ export default async function MePage() {
                       <SkillChip key={s.id} name={s.name} />
                     ))}
                   </div>
+                  {applications.has(offer.id) ? (
+                    <div className="mt-3 flex items-center gap-2 font-mono text-[11px] text-slate-500">
+                      candidature : <StatusBadge status={applications.get(offer.id)!} />
+                    </div>
+                  ) : null}
                 </Link>
               </Reveal>
             </li>

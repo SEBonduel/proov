@@ -233,7 +233,9 @@ model Match {
   // Explication en langage naturel (générée par l'IA, optionnelle)
   explanation String?
 
-  shortlisted Boolean   @default(false)
+  shortlisted Boolean     @default(false)
+  // Statut de la candidature côté recruteur (pipeline).
+  status      MatchStatus @default(NEW)
   // Renseigné quand le candidat postule explicitement à l'offre.
   appliedAt   DateTime?
 
@@ -242,6 +244,12 @@ model Match {
 
   @@unique([offerId, candidateId])
   @@index([offerId, score])
+}
+
+enum MatchStatus {
+  NEW
+  SHORTLISTED
+  REJECTED
 }
 
 // ───────────────────────────── Messagerie ────────────────────────────────────

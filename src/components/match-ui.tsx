@@ -130,6 +130,34 @@ export function categoryLabel(c: string): string {
   return CATEGORY_LABEL[c] ?? c;
 }
 
+// ── Statut de candidature (pipeline) ─────────────────────────────────────────
+const STATUS_LABEL: Record<string, string> = {
+  NEW: "Nouveau",
+  SHORTLISTED: "Shortlisté",
+  REJECTED: "Écarté",
+};
+const MATCH_STATUS_STYLE: Record<string, string> = {
+  NEW: "bg-white/5 text-slate-400 ring-white/10",
+  SHORTLISTED: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/25",
+  REJECTED: "bg-rose-400/10 text-rose-300 ring-rose-400/25",
+};
+
+export function statusLabel(status: string): string {
+  return STATUS_LABEL[status] ?? status;
+}
+
+export function StatusBadge({ status }: { status: string }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold uppercase ring-1 ${
+        MATCH_STATUS_STYLE[status] ?? MATCH_STATUS_STYLE.NEW
+      }`}
+    >
+      {statusLabel(status)}
+    </span>
+  );
+}
+
 const CONTRACT_LABEL: Record<string, string> = {
   ALTERNANCE: "Alternance",
   STAGE: "Stage",

@@ -66,13 +66,21 @@ export async function getOfferDetail(offerId: string) {
   });
 }
 
-/** Date de candidature d'un candidat à une offre (null s'il n'a pas postulé). */
+/** Candidature d'un candidat à une offre (date + statut), null si inexistant. */
 export async function getApplicationStatus(offerId: string, candidateId: string) {
-  const m = await prisma.match.findUnique({
+  return prisma.match.findUnique({
     where: { offerId_candidateId: { offerId, candidateId } },
-    select: { appliedAt: true },
+    select: { appliedAt: true, status: true },
   });
-  return m?.appliedAt ?? null;
+}
+
+/** Map offerId → { status, appliedAt } des candidatures envoyées par un candidat. */
+export async function getCandidateApplications(candidateId: string) {
+  const matches = await prisma.match.findMany({
+    where: { candidateId, appliedAt: { not: null } },
+    select: { offerId: true, status: true },
+  });
+  return new Map(matches.map((m) => [m.offerId, m.status]));
 }
 
 // ── Messagerie ──────────────────────────────────────────────────────────────

@@ -7,8 +7,8 @@ export default async function NewOfferPage() {
   await requireRecruiter();
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <Link href="/" className="font-mono text-sm text-slate-500 transition hover:text-emerald-300">
-        ← offres
+      <Link href="/" className="inline-block font-mono text-sm text-slate-500 transition hover:text-emerald-300">
+        ← Offres
       </Link>
       <Reveal>
         <div>
