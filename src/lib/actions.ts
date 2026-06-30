@@ -100,6 +100,46 @@ export async function createOffer(
   redirect(`/offers/${offer.id}`);
 }
 
+export type ProfileState = { error?: string };
+
+const recruiterProfileSchema = z.object({
+  name: z.string().trim().min(1, "Nom requis").max(80),
+  company: z.string().trim().max(80).optional(),
+  bio: z.string().trim().max(500).optional(),
+  website: z.string().trim().max(200).optional(),
+});
+
+/** Le recruteur met à jour son profil public (nom, entreprise, bio, site web). */
+export async function updateRecruiterProfile(
+  _prev: ProfileState,
+  formData: FormData,
+): Promise<ProfileState> {
+  const recruiter = await requireRecruiter();
+  const parsed = recruiterProfileSchema.safeParse({
+    name: formData.get("name"),
+    company: formData.get("company") || undefined,
+    bio: formData.get("bio") || undefined,
+    website: formData.get("website") || undefined,
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+
+  let website = parsed.data.website;
+  if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`;
+
+  await prisma.user.update({
+    where: { id: recruiter.id },
+    data: {
+      name: parsed.data.name,
+      company: parsed.data.company ?? null,
+      bio: parsed.data.bio ?? null,
+      website: website ?? null,
+    },
+  });
+
+  revalidatePath(`/recruiters/${recruiter.id}`);
+  redirect(`/recruiters/${recruiter.id}`);
+}
+
 export type LinkState = { error?: string };
 
 const GH_USERNAME = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;

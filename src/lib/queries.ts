@@ -137,6 +137,31 @@ export async function getConversationForUser(id: string, userId: string) {
   return conversation;
 }
 
+/** Profil public d'un recruteur + ses offres ouvertes. Null si l'id n'est pas un recruteur. */
+export async function getRecruiterProfile(id: string) {
+  const recruiter = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      company: true,
+      bio: true,
+      website: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+  if (!recruiter || (recruiter.role !== "RECRUITER" && recruiter.role !== "ADMIN")) return null;
+
+  const offers = await prisma.offer.findMany({
+    where: { recruiterId: id, status: "OPEN" },
+    orderBy: { createdAt: "desc" },
+    include: { requiredSkills: true },
+  });
+
+  return { recruiter, offers };
+}
+
 export async function getCandidates() {
   return prisma.candidate.findMany({
     where: { analysisStatus: "ANALYZED" },

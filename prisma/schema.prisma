@@ -23,6 +23,8 @@ model User {
   emailVerified DateTime?
   image         String?
   company       String?
+  bio           String?
+  website       String?
   githubLogin   String?   @unique
   passwordHash  String?
   role          Role?

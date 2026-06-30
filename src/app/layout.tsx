@@ -45,6 +45,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               {user?.role === "CANDIDATE" ? (
                 <Link href="/me" className={navLink}>Profil</Link>
               ) : null}
+              {isRecruiter ? (
+                <Link href={`/recruiters/${user!.id}`} className={navLink}>Profil</Link>
+              ) : null}
               {user ? (
                 <Link href="/messages" className={`relative ${navLink}`}>
                   Messages

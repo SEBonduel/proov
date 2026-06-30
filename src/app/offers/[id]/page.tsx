@@ -23,7 +23,14 @@ function OfferHeader({ offer }: { offer: OfferDetail }) {
     <section className="rounded-2xl p-7 panel">
       <h1 className="text-2xl font-bold sm:text-3xl">{offer.title}</h1>
       <p className="mt-2 font-mono text-xs text-slate-500">
-        {offer.recruiter.company ? `${offer.recruiter.company} · ` : ""}
+        {offer.recruiter.company ? (
+          <>
+            <Link href={`/recruiters/${offer.recruiterId}`} className="text-slate-400 transition hover:text-emerald-300">
+              {offer.recruiter.company}
+            </Link>
+            {" · "}
+          </>
+        ) : null}
         {contractLabel(offer.contractType)}
         {offer.location ? ` · ${offer.location}` : ""}
         {offer.remote ? " · remote" : ""}
