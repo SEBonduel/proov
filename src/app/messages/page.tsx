@@ -35,15 +35,13 @@ export default async function MessagesPage() {
                   >
                     <Avatar name={otherName} seed={other.email ?? other.id} size={44} />
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="truncate font-semibold">{otherName}</span>
-                        {c.offer ? (
-                          <span className="shrink-0 truncate font-mono text-[11px] text-slate-500">
-                            {c.offer.title}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="truncate text-sm text-slate-500">
+                      <span className="block truncate font-semibold">{otherName}</span>
+                      {c.offer ? (
+                        <span className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-md bg-emerald-400/10 px-2 py-0.5 font-mono text-[10px] text-emerald-300 ring-1 ring-emerald-400/20">
+                          💼 {c.offer.title}
+                        </span>
+                      ) : null}
+                      <p className="mt-1 truncate text-sm text-slate-500">
                         {last ? last.body : "Nouvelle conversation"}
                       </p>
                     </div>

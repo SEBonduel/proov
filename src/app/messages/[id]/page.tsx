@@ -33,15 +33,15 @@ export default async function ConversationPage({
 
       <div className="flex items-center gap-3">
         <Avatar name={otherName} seed={other.email ?? other.id} size={44} />
-        <div>
+        <div className="min-w-0">
           <h1 className="font-semibold">{otherName}</h1>
           {conversation.offer ? (
-            <p className="font-mono text-xs text-slate-500">
-              à propos de :{" "}
-              <Link href={`/offers/${conversation.offer.id}`} className="hover:text-emerald-300">
-                {conversation.offer.title}
-              </Link>
-            </p>
+            <Link
+              href={`/offers/${conversation.offer.id}`}
+              className="mt-1 inline-flex max-w-full items-center gap-1 truncate rounded-md bg-emerald-400/10 px-2 py-0.5 font-mono text-xs text-emerald-300 ring-1 ring-emerald-400/20 transition hover:bg-emerald-400/20"
+            >
+              💼 {conversation.offer.title}
+            </Link>
           ) : null}
         </div>
       </div>
