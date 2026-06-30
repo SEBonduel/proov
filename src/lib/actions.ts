@@ -102,6 +102,111 @@ export async function createOffer(
   redirect(`/offers/${offer.id}`);
 }
 
+function parseOfferForm(formData: FormData) {
+  let skills: unknown = [];
+  try {
+    const raw = formData.get("skillsJson");
+    skills = JSON.parse(typeof raw === "string" ? raw : "[]");
+  } catch {
+    return null;
+  }
+  return offerSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    location: formData.get("location") || undefined,
+    remote: formData.get("remote") === "on" || formData.get("remote") === "true",
+    contractType: formData.get("contractType"),
+    seniority: formData.get("seniority"),
+    skills,
+  });
+}
+
+/** Le recruteur modifie une de ses offres (et recalcule le classement). */
+export async function updateOffer(
+  _prev: CreateOfferState,
+  formData: FormData,
+): Promise<CreateOfferState> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const recruiter = await requireRecruiter();
+  const existing = await prisma.offer.findUnique({
+    where: { id: offerId },
+    select: { recruiterId: true },
+  });
+  if (!existing || existing.recruiterId !== recruiter.id) return { error: "Accès refusé." };
+
+  const parsed = parseOfferForm(formData);
+  if (!parsed) return { error: "Compétences invalides." };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+  const data = parsed.data;
+
+  await prisma.offer.update({
+    where: { id: offerId },
+    data: {
+      title: data.title,
+      description: data.description,
+      location: data.location ?? null,
+      remote: data.remote,
+      contractType: data.contractType,
+      seniority: data.seniority,
+    },
+  });
+  // On remplace les compétences requises puis on recalcule les matchs (les
+  // candidatures/statuts existants sont préservés par l'upsert).
+  await prisma.requiredSkill.deleteMany({ where: { offerId } });
+  await prisma.requiredSkill.createMany({
+    data: data.skills.map((s) => ({ offerId, name: s.name, weight: s.weight, mustHave: s.mustHave })),
+  });
+  await recomputeMatchesForOffer(offerId);
+
+  revalidatePath(`/offers/${offerId}`);
+  redirect(`/offers/${offerId}`);
+}
+
+/** Ferme / rouvre une offre. */
+export async function toggleOfferStatus(formData: FormData): Promise<void> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const recruiter = await requireRecruiter();
+  const offer = await prisma.offer.findUnique({
+    where: { id: offerId },
+    select: { recruiterId: true, status: true },
+  });
+  if (!offer || offer.recruiterId !== recruiter.id) return;
+  await prisma.offer.update({
+    where: { id: offerId },
+    data: { status: offer.status === "OPEN" ? "CLOSED" : "OPEN" },
+  });
+  revalidatePath(`/offers/${offerId}`);
+  revalidatePath("/");
+}
+
+/** Duplique une offre (et redirige vers l'édition de la copie). */
+export async function duplicateOffer(formData: FormData): Promise<void> {
+  const offerId = String(formData.get("offerId") ?? "");
+  const recruiter = await requireRecruiter();
+  const offer = await prisma.offer.findUnique({
+    where: { id: offerId },
+    include: { requiredSkills: true },
+  });
+  if (!offer || offer.recruiterId !== recruiter.id) return;
+
+  const copy = await prisma.offer.create({
+    data: {
+      recruiterId: recruiter.id,
+      title: `${offer.title} (copie)`,
+      description: offer.description,
+      location: offer.location,
+      remote: offer.remote,
+      contractType: offer.contractType,
+      seniority: offer.seniority,
+      requiredSkills: {
+        create: offer.requiredSkills.map((s) => ({ name: s.name, weight: s.weight, mustHave: s.mustHave })),
+      },
+    },
+  });
+  await recomputeMatchesForOffer(copy.id);
+  redirect(`/offers/${copy.id}/edit`);
+}
+
 export type ProfileState = { error?: string };
 
 const recruiterProfileSchema = z.object({

@@ -1,12 +1,23 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { createOffer, type CreateOfferState } from "@/lib/actions";
+import { createOffer, updateOffer, type CreateOfferState } from "@/lib/actions";
 
 interface SkillRow {
   name: string;
   weight: number;
   mustHave: boolean;
+}
+
+export interface OfferInit {
+  id: string;
+  title: string;
+  description: string;
+  location: string | null;
+  remote: boolean;
+  contractType: string;
+  seniority: string;
+  requiredSkills: { name: string; weight: number; mustHave: boolean }[];
 }
 
 const SUGGESTIONS = [
@@ -19,15 +30,20 @@ const inputClass =
 
 const labelClass = "mb-1.5 block font-mono text-xs uppercase tracking-wider text-slate-500";
 
-export function OfferForm() {
+export function OfferForm({ offer }: { offer?: OfferInit }) {
+  const editing = Boolean(offer);
   const [state, formAction, pending] = useActionState<CreateOfferState, FormData>(
-    createOffer,
+    editing ? updateOffer : createOffer,
     {},
   );
-  const [skills, setSkills] = useState<SkillRow[]>([
-    { name: "React", weight: 5, mustHave: true },
-    { name: "TypeScript", weight: 4, mustHave: true },
-  ]);
+  const [skills, setSkills] = useState<SkillRow[]>(
+    offer && offer.requiredSkills.length > 0
+      ? offer.requiredSkills.map((s) => ({ name: s.name, weight: s.weight, mustHave: s.mustHave }))
+      : [
+          { name: "React", weight: 5, mustHave: true },
+          { name: "TypeScript", weight: 4, mustHave: true },
+        ],
+  );
 
   const addSkill = (name = "") =>
     setSkills((s) =>
@@ -44,33 +60,34 @@ export function OfferForm() {
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="skillsJson" value={JSON.stringify(cleanSkills)} />
+      {offer ? <input type="hidden" name="offerId" value={offer.id} /> : null}
 
       <div className="rounded-2xl p-6 panel">
         <div className="space-y-4">
           <div>
             <label className={labelClass} htmlFor="title">Intitulé du poste</label>
-            <input id="title" name="title" required className={`${inputClass} w-full`}
+            <input id="title" name="title" required defaultValue={offer?.title} className={`${inputClass} w-full`}
               placeholder="Alternance — Développeur·se Frontend React" />
           </div>
           <div>
             <label className={labelClass} htmlFor="description">Description</label>
-            <textarea id="description" name="description" required rows={4} className={`${inputClass} w-full`}
+            <textarea id="description" name="description" required rows={4} defaultValue={offer?.description} className={`${inputClass} w-full`}
               placeholder="Missions, contexte, stack…" />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="location">Localisation</label>
-              <input id="location" name="location" className={`${inputClass} w-full`} placeholder="Metz" />
+              <input id="location" name="location" defaultValue={offer?.location ?? ""} className={`${inputClass} w-full`} placeholder="Metz" />
             </div>
             <div className="flex items-end pb-1">
               <label className="flex cursor-pointer items-center gap-2 font-mono text-sm text-slate-300">
-                <input type="checkbox" name="remote" className="h-4 w-4 accent-emerald-400" />
+                <input type="checkbox" name="remote" defaultChecked={offer?.remote} className="h-4 w-4 accent-emerald-400" />
                 télétravail possible
               </label>
             </div>
             <div>
               <label className={labelClass} htmlFor="contractType">Type de contrat</label>
-              <select id="contractType" name="contractType" defaultValue="ALTERNANCE" className={`${inputClass} w-full`}>
+              <select id="contractType" name="contractType" defaultValue={offer?.contractType ?? "ALTERNANCE"} className={`${inputClass} w-full`}>
                 <option value="ALTERNANCE">Alternance</option>
                 <option value="STAGE">Stage</option>
                 <option value="CDI">CDI</option>
@@ -80,7 +97,7 @@ export function OfferForm() {
             </div>
             <div>
               <label className={labelClass} htmlFor="seniority">Séniorité</label>
-              <select id="seniority" name="seniority" defaultValue="JUNIOR" className={`${inputClass} w-full`}>
+              <select id="seniority" name="seniority" defaultValue={offer?.seniority ?? "JUNIOR"} className={`${inputClass} w-full`}>
                 <option value="INTERN">Débutant</option>
                 <option value="JUNIOR">Junior</option>
                 <option value="MID">Confirmé</option>
@@ -172,7 +189,11 @@ export function OfferForm() {
         disabled={pending}
         className="inline-flex items-center gap-2 rounded-xl bg-emerald-400 px-5 py-2.5 font-semibold text-emerald-950 transition hover:bg-emerald-300 disabled:opacity-60"
       >
-        {pending ? "Calcul du classement…" : "Publier et classer les candidats →"}
+        {pending
+          ? "Calcul du classement…"
+          : editing
+            ? "Enregistrer les modifications →"
+            : "Publier et classer les candidats →"}
       </button>
     </form>
   );

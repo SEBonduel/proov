@@ -7,6 +7,7 @@ import {
   getApplicationStatus,
 } from "@/lib/queries";
 import { getSessionUser } from "@/lib/auth-helpers";
+import { toggleOfferStatus, duplicateOffer } from "@/lib/actions";
 import { computeMatch, type MatchResult } from "@/lib/matching";
 import { CandidateMatchCard } from "@/components/CandidateMatchCard";
 import { CandidateCompare } from "@/components/CandidateCompare";
@@ -95,6 +96,46 @@ export default async function OfferPage({
         </Link>
         <Reveal>
           <OfferHeader offer={offer} />
+        </Reveal>
+
+        <Reveal delay={0.03}>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-mono text-xs ${
+                offer.status === "OPEN"
+                  ? "bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/25"
+                  : "bg-white/5 text-slate-400 ring-1 ring-white/10"
+              }`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${offer.status === "OPEN" ? "bg-emerald-400" : "bg-slate-500"}`} />
+              {offer.status === "OPEN" ? "Offre ouverte" : "Offre fermée"}
+            </span>
+            <div className="flex-1" />
+            <Link
+              href={`/offers/${offer.id}/edit`}
+              className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300"
+            >
+              Éditer
+            </Link>
+            <form action={toggleOfferStatus}>
+              <input type="hidden" name="offerId" value={offer.id} />
+              <button
+                type="submit"
+                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-amber-400/40 hover:text-amber-300"
+              >
+                {offer.status === "OPEN" ? "Fermer l'offre" : "Rouvrir l'offre"}
+              </button>
+            </form>
+            <form action={duplicateOffer}>
+              <input type="hidden" name="offerId" value={offer.id} />
+              <button
+                type="submit"
+                className="rounded-lg border border-white/10 px-3 py-1.5 font-mono text-xs text-slate-300 transition hover:border-emerald-400/40 hover:text-emerald-300"
+              >
+                Dupliquer
+              </button>
+            </form>
+          </div>
         </Reveal>
 
         {allMatches.length >= 2 ? (
