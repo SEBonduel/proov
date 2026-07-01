@@ -5,7 +5,7 @@ import { computeMatch, type MatchResult } from "@/lib/matching";
 // rester DRY et faciles à tester / faire évoluer.
 
 // Sans recruiterId : vitrine publique (offres ouvertes). Avec recruiterId :
-// les offres de ce recruteur uniquement (ouvertes ET fermées) → « Mes offres ».
+// les offres de ce recruteur uniquement (ouvertes et fermées) → « Mes offres ».
 export async function getOffersOverview(recruiterId?: string) {
   const offers = await prisma.offer.findMany({
     where: recruiterId ? { recruiterId } : { status: "OPEN" },
@@ -83,7 +83,7 @@ export async function getCandidateApplications(candidateId: string) {
   return new Map(matches.map((m) => [m.offerId, m.status]));
 }
 
-// ── Messagerie ──────────────────────────────────────────────────────────────
+// Messagerie
 
 export async function getConversationsForUser(userId: string) {
   return prisma.conversation.findMany({
@@ -200,10 +200,10 @@ export async function getRecruiterStats(recruiterId: string) {
 
   // Répartition des scores de matching (tous candidats classés).
   const scoreBuckets = [
-    { label: "0–39", min: 0, max: 39, count: 0 },
-    { label: "40–59", min: 40, max: 59, count: 0 },
-    { label: "60–79", min: 60, max: 79, count: 0 },
-    { label: "80–100", min: 80, max: 100, count: 0 },
+    { label: "0-39", min: 0, max: 39, count: 0 },
+    { label: "40-59", min: 40, max: 59, count: 0 },
+    { label: "60-79", min: 60, max: 79, count: 0 },
+    { label: "80-100", min: 80, max: 100, count: 0 },
   ];
   for (const m of allMatches) {
     const b = scoreBuckets.find((x) => m.score >= x.min && m.score <= x.max);

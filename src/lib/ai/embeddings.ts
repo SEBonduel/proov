@@ -1,13 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Embeddings & recherche sémantique
 //
 // On représente chaque candidat par un vecteur (embedding Gemini) construit à
-// partir de ses compétences PROUVÉES, de ses langages et de ses vrais projets.
+// partir de ses compétences prouvées, de ses langages et de ses vrais projets.
 // Une requête en langage naturel est projetée dans le même espace ; on classe
 // les candidats par similarité cosinus. Repli mots-clés si l'IA est indisponible.
-// ─────────────────────────────────────────────────────────────────────────────
 
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL ?? "gemini-embedding-2";
 
@@ -52,7 +50,7 @@ export function candidateEmbeddingText(input: {
     ...input.repos
       .slice(0, 10)
       .map((r) =>
-        [r.name, r.description, r.topics.join(" ")].filter(Boolean).join(" — "),
+        [r.name, r.description, r.topics.join(" ")].filter(Boolean).join(" · "),
       ),
   ];
   return parts.filter(Boolean).join("\n");

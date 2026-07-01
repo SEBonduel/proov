@@ -1,4 +1,4 @@
-// Proov — schéma de données
+// Proov, schéma de données
 // Plateforme de recrutement « par la preuve du code » : un recruteur poste une
 // offre, l'IA classe des candidats dont les compétences sont vérifiées depuis
 // leur GitHub réel, avec un score de matching explicable.
@@ -13,7 +13,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// ───────────────────────────── Auth (NextAuth / Auth.js) ─────────────────────
+// Auth (NextAuth / Auth.js)
 // Le recruteur est l'utilisateur authentifié de la plateforme.
 
 model User {
@@ -81,7 +81,7 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ───────────────────────────── Domaine métier ────────────────────────────────
+// Domaine métier
 
 // Un candidat développeur, sourcé depuis un profil GitHub public.
 model Candidate {
@@ -113,7 +113,7 @@ model Candidate {
   // Kit d'entretien généré par l'IA (questions ciblées sur le vrai code), mis en cache.
   interviewKit Json?
 
-  // Score d'activité récente 0–100 (fraîcheur des contributions)
+  // Score d'activité récente 0-100 (fraîcheur des contributions)
   activityScore Int @default(0)
 
   // Préférences du candidat (mobilité, télétravail, contrats recherchés)
@@ -151,7 +151,7 @@ enum RemotePref {
   REMOTE
 }
 
-// Une compétence d'un candidat, VÉRIFIÉE depuis son code (pas déclarée).
+// Une compétence d'un candidat, vérifiée depuis son code (pas déclarée).
 model CandidateSkill {
   id          String       @id @default(cuid())
   candidateId String
@@ -160,7 +160,7 @@ model CandidateSkill {
   name     String // normalisé, ex. "React", "PostgreSQL", "Docker"
   category SkillCategory
 
-  // Force de la preuve 0–100 : combien le code atteste réellement cette compétence
+  // Force de la preuve 0-100 : combien le code atteste réellement cette compétence
   proofStrength Int
   // Récence d'usage, en mois depuis la dernière utilisation observée
   recencyMonths Int @default(0)
@@ -233,7 +233,7 @@ model RequiredSkill {
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
 
   name     String
-  weight   Int     @default(3) // importance 1–5
+  weight   Int     @default(3) // importance 1-5
   mustHave Boolean @default(false)
 
   @@unique([offerId, name])
@@ -247,7 +247,7 @@ model Match {
   candidateId String
   candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
-  // Score global 0–100
+  // Score global 0-100
   score Int
 
   // Décomposition explicable du score (par compétence requise : couverte ou non,
@@ -276,7 +276,7 @@ enum MatchStatus {
   REJECTED
 }
 
-// ───────────────────────────── Messagerie ────────────────────────────────────
+// Messagerie
 // Fil de discussion entre un recruteur et un candidat (qui possède un compte),
 // dans le contexte d'une offre. Quasi temps réel via polling côté client.
 

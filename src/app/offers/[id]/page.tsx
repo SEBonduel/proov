@@ -78,7 +78,7 @@ export default async function OfferPage({
     (user.role === "RECRUITER" || user.role === "ADMIN") &&
     offer.recruiterId === user.id;
 
-  // ─── Vue recruteur propriétaire : classement complet des candidats ───
+  // Vue recruteur propriétaire : classement complet des candidats
   if (isOwner) {
     const data = await getOfferWithRanking(id);
     const allMatches = data?.matches ?? [];
@@ -196,7 +196,7 @@ export default async function OfferPage({
     );
   }
 
-  // ─── Vue candidat : sa propre adéquation + candidature (pas le classement) ───
+  // Vue candidat : sa propre adéquation + candidature (pas le classement)
   const candidate =
     user?.role === "CANDIDATE" ? await getCandidateByUserId(user.id) : null;
 

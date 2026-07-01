@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 // Animation d'entrée : fondu + glissement vertical. Déclenchée au montage
 // (et non sur défilement) pour garantir que le contenu déjà visible au
-// chargement s'affiche toujours — sans page qui paraît vide avant un scroll.
+// chargement s'affiche toujours, sans page vide avant un scroll.
 export function Reveal({
   children,
   delay = 0,

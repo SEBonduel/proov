@@ -2,7 +2,7 @@ import type { GitHubProfileData, RepoSignal } from "../src/lib/github";
 
 // Profils de démonstration réalistes et variés, pour alimenter l'app sans dépendre
 // du réseau ni d'un token GitHub. Quand un GITHUB_TOKEN est fourni, le seed peut
-// en plus ingérer de VRAIS profils publics (voir prisma/seed.ts).
+// en plus ingérer de vrais profils publics (voir prisma/seed.ts).
 // L'avatar utilise DiceBear (rendu garanti, sans compte GitHub réel).
 
 const now = Date.now();
@@ -63,7 +63,7 @@ export const FIXTURE_PROFILES: GitHubProfileData[] = [
     {
       login: "alice-frontend",
       name: "Alice Moreau",
-      bio: "Frontend engineer — React, design systems, accessibilité.",
+      bio: "Frontend engineer. React, design systems, accessibilité.",
       location: "Lyon, France",
       followers: 210,
       publicRepos: 34,
@@ -164,7 +164,7 @@ export const FIXTURE_PROFILES: GitHubProfileData[] = [
     {
       login: "driss-mobile",
       name: "Driss Benali",
-      bio: "Mobile developer — Flutter & Dart.",
+      bio: "Mobile developer. Flutter & Dart.",
       location: "Marseille, France",
       followers: 120,
       publicRepos: 22,
@@ -228,7 +228,7 @@ export const FIXTURE_PROFILES: GitHubProfileData[] = [
     {
       login: "farid-php",
       name: "Farid Haddad",
-      bio: "Web developer — Laravel & Vue.",
+      bio: "Web developer. Laravel & Vue.",
       location: "Lille, France",
       followers: 90,
       publicRepos: 26,

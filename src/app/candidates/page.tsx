@@ -18,7 +18,7 @@ export default async function CandidatesPage() {
           </h1>
           <p className="mt-1 text-slate-400">
             <span className="text-slate-200">{candidates.length}</span> profils analysés
-            depuis leur code GitHub — cherchez en langage naturel.
+            depuis leur code GitHub. Cherchez en langage naturel.
           </p>
         </div>
       </Reveal>

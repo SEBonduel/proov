@@ -1,6 +1,6 @@
 import type { SkillStatus } from "@/lib/matching";
 
-// Composants de présentation partagés — palette pensée pour le thème sombre.
+// Composants de présentation partagés, adaptés au thème sombre.
 
 export function scoreTier(score: number): {
   text: string;
@@ -130,7 +130,7 @@ export function categoryLabel(c: string): string {
   return CATEGORY_LABEL[c] ?? c;
 }
 
-// ── Statut de candidature (pipeline) ─────────────────────────────────────────
+// Statut de candidature (pipeline)
 const STATUS_LABEL: Record<string, string> = {
   NEW: "Nouveau",
   SHORTLISTED: "Shortlisté",

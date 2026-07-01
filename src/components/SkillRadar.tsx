@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 interface Axis {
   label: string;
-  value: number; // 0–100
+  value: number; // 0-100
 }
 
 // Radar de compétences : visualise la couverture des compétences requises par un

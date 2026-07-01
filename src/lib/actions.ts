@@ -624,7 +624,7 @@ export async function applyToOffer(_prev: ApplyState, formData: FormData): Promi
     where: { userId: user.id },
     include: { skills: true },
   });
-  if (!candidate) return { error: "Profil candidat introuvable — réessayez plus tard." };
+  if (!candidate) return { error: "Profil candidat introuvable, réessayez plus tard." };
 
   const offer = await prisma.offer.findUnique({
     where: { id: offerId },

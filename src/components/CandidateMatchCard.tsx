@@ -84,7 +84,7 @@ export function CandidateMatchCard({
 
       {match.capped ? (
         <p className="mt-4 rounded-lg bg-amber-400/10 px-3 py-2 font-mono text-xs text-amber-300 ring-1 ring-amber-400/25">
-          ⚠ score plafonné — compétence(s) obligatoire(s) non prouvée(s) :{" "}
+          ⚠ score plafonné, compétence(s) obligatoire(s) non prouvée(s) :{" "}
           {match.missingMustHaves.join(", ")}
         </p>
       ) : null}

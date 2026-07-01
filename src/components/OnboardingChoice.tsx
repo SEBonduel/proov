@@ -65,7 +65,7 @@ export function OnboardingChoice() {
 
       {submitting === "CANDIDATE" ? (
         <p className="mt-5 text-center font-mono text-xs text-slate-500">
-          Connexion à GitHub et analyse de vos dépôts en cours — cela peut prendre quelques secondes.
+          Connexion à GitHub et analyse de vos dépôts en cours, cela peut prendre quelques secondes.
         </p>
       ) : null}
     </>

@@ -1,14 +1,12 @@
 import { Octokit } from "@octokit/rest";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Ingestion GitHub
 //
-// Objectif : à partir d'un pseudo GitHub, récupérer un signal RÉEL et structuré
+// Objectif : à partir d'un pseudo GitHub, récupérer un signal réel et structuré
 // sur le code du développeur (langages réellement écrits en octets, frameworks
 // et outils détectés dans les manifestes de dépendances, activité récente).
-// C'est cette matière première, factuelle, qui permet ensuite de PROUVER les
-// compétences — au lieu de les déclarer.
-// ─────────────────────────────────────────────────────────────────────────────
+// C'est cette matière première, factuelle, qui permet ensuite de prouver les
+// compétences, au lieu de les déclarer.
 
 export interface RepoManifestDeps {
   ecosystem: string; // "npm" | "pip" | "go" | "cargo" | "dart" | "composer" | "gem"
@@ -33,7 +31,7 @@ export interface RepoSignal {
   createdAt: string | null;
   manifests: RepoManifestDeps[];
   readmeExcerpt: string | null;
-  /** true si le candidat a CONTRIBUÉ au repo sans en être le propriétaire. */
+  /** true si le candidat a contribué au repo sans en être le propriétaire. */
   isContributed?: boolean;
   /** propriétaire du repo (utile pour les repos de contribution). */
   owner?: string;
@@ -53,7 +51,7 @@ export interface GitHubProfileData {
   repos: RepoSignal[];
   /** Octets de code agrégés par langage sur l'ensemble des repos retenus. */
   languageTotals: Record<string, number>;
-  /** Score d'activité récente 0–100 (fraîcheur des contributions). */
+  /** Score d'activité récente 0-100 (fraîcheur des contributions). */
   activityScore: number;
   fetchedAt: string;
 }
@@ -196,7 +194,7 @@ function parseManifest(ecosystem: string, raw: string): string[] {
   }
 }
 
-/** Calcule un score d'activité 0–100 à partir de la date de push la plus récente. */
+/** Calcule un score d'activité 0-100 à partir de la date de push la plus récente. */
 function computeActivityScore(repos: RepoSignal[]): number {
   const pushDates = repos
     .map((r) => (r.pushedAt ? new Date(r.pushedAt).getTime() : 0))
@@ -224,7 +222,7 @@ async function fetchRepoManifests(
   repo: string,
 ): Promise<RepoManifestDeps[]> {
   // Optimisation : on liste d'abord les fichiers à la racine (1 appel) pour ne
-  // requêter que les manifestes réellement présents — au lieu de tenter chaque
+  // requêter que les manifestes réellement présents, au lieu de tenter chaque
   // fichier connu et de récolter des 404 (économie d'appels API au seed).
   let rootFiles: Set<string>;
   try {
@@ -422,9 +420,9 @@ export async function fetchGitHubProfile(
     });
   }
 
-  // Agrégation des octets de code par langage sur les repos DU CANDIDAT
+  // Agrégation des octets de code par langage sur les repos du candidat
   // uniquement (on ne compte pas le code des repos de contribution, qu'il n'a
-  // pas entièrement écrit — cela fausserait la répartition des langages).
+  // pas entièrement écrit, cela fausserait la répartition des langages).
   const languageTotals: Record<string, number> = {};
   for (const repo of repos) {
     for (const [lang, bytes] of Object.entries(repo.languages)) {

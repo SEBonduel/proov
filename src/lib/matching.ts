@@ -1,25 +1,23 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Moteur de matching explicable
 //
 // Principe : le score n'est PAS une boîte noire. Pour chaque compétence requise
 // par l'offre, on regarde si le candidat la prouve (force de preuve tirée du
 // code), à quel point elle est récente, et son importance pour l'offre. Le score
 // global est une moyenne pondérée, et on renvoie la décomposition complète pour
-// que le recruteur (et le jury !) comprenne EXACTEMENT d'où vient le chiffre.
+// que le recruteur (et le jury !) comprenne exactement d'où vient le chiffre.
 //
 // Module volontairement pur (sans I/O ni Prisma) : trivialement testable.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface CandidateSkillInput {
   name: string;
-  proofStrength: number; // 0–100 : force de la preuve tirée du code
+  proofStrength: number; // 0-100 : force de la preuve tirée du code
   recencyMonths: number; // mois depuis la dernière utilisation observée
   evidenceRepos?: string[];
 }
 
 export interface RequiredSkillInput {
   name: string;
-  weight: number; // importance 1–5
+  weight: number; // importance 1-5
   mustHave: boolean;
 }
 
@@ -33,9 +31,9 @@ export interface SkillBreakdown {
   /** Force de preuve du candidat pour cette compétence (0 si absente). */
   proofStrength: number;
   recencyMonths: number;
-  /** Score de la compétence après pondération par la récence (0–100). */
+  /** Score de la compétence après pondération par la récence (0-100). */
   skillScore: number;
-  /** Contribution réelle au score global, en points (0–100). */
+  /** Contribution réelle au score global, en points (0-100). */
   contribution: number;
   /** Contribution maximale possible si la compétence était parfaitement prouvée. */
   maxContribution: number;
@@ -43,7 +41,7 @@ export interface SkillBreakdown {
 }
 
 export interface MatchResult {
-  score: number; // 0–100
+  score: number; // 0-100
   label: MatchLabel;
   breakdown: SkillBreakdown[];
   /** Compétences fortes du candidat non demandées par l'offre (bonus de contexte). */
@@ -87,7 +85,7 @@ export function normalizeSkillName(name: string): string {
 /**
  * Facteur de récence ∈ [RECENCY_FLOOR, 1] : une compétence récente vaut 1, une
  * compétence ancienne décote linéairement jusqu'à un plancher (elle n'est jamais
- * totalement nulle — savoir oublié ≠ jamais su).
+ * totalement nulle (savoir oublié, ce n'est pas jamais su).
  */
 export function recencyFactor(recencyMonths: number): number {
   const decayed = 1 - Math.max(0, recencyMonths) / RECENCY_HORIZON_MONTHS;
@@ -183,7 +181,7 @@ export function computeMatch(
 
   let score = maxWeightedSum === 0 ? 0 : Math.round((weightedSum / maxWeightedSum) * 100);
 
-  // Plafonnement : une compétence OBLIGATOIRE non prouvée empêche un score élevé.
+  // Plafonnement : une compétence obligatoire non prouvée empêche un score élevé.
   const capped = missingMustHaves.length > 0 && score > MUSTHAVE_CAP;
   if (capped) score = MUSTHAVE_CAP;
 

@@ -2,7 +2,6 @@ import type { GitHubProfileData, RepoSignal } from "@/lib/github";
 import type { ExtractedSkill, ExtractionResult, SkillCategory, SkillExtractor } from "./types";
 import { DEPENDENCY_SKILLS, NON_SKILL_LANGUAGES, TOPIC_SKILLS } from "./skill-mappings";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Extracteur par règles (fallback déterministe, sans IA)
 //
 // Produit des compétences VÉRIFIÉES à partir de signaux factuels :
@@ -11,7 +10,6 @@ import { DEPENDENCY_SKILLS, NON_SKILL_LANGUAGES, TOPIC_SKILLS } from "./skill-ma
 //   • domaines : topics des repos
 // Chaque compétence porte une force de preuve, une récence et des repos témoins.
 // Reproductible (aucune part d'aléatoire) → idéal pour des tests et une démo stable.
-// ─────────────────────────────────────────────────────────────────────────────
 
 const MS_PER_MONTH = 1000 * 60 * 60 * 24 * 30.44;
 
@@ -67,7 +65,7 @@ function languageSkills(profile: GitHubProfileData): ExtractedSkill[] {
       proofStrength,
       recencyMonths: bestRecency(reposWithLang),
       evidenceRepos: evidenceUrls(reposWithLang),
-      reasoning: `${(bytes / 1024).toFixed(0)} ko de code sur ${repoCount} repo(s) — ${(share * 100).toFixed(0)} % du code public.`,
+      reasoning: `${(bytes / 1024).toFixed(0)} ko de code sur ${repoCount} repo(s), ${(share * 100).toFixed(0)} % du code public.`,
     });
   }
   return skills;

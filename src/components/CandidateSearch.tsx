@@ -124,7 +124,7 @@ export function CandidateSearch({ children }: { children: ReactNode }) {
             </ul>
           ) : (
             <p className="rounded-2xl border border-dashed border-white/10 p-10 text-center font-mono text-sm text-slate-500">
-              aucun candidat ne correspond — essayez d'autres termes
+              aucun candidat ne correspond, essayez d'autres termes
             </p>
           )}
         </div>

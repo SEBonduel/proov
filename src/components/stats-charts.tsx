@@ -57,7 +57,7 @@ export interface DonutSegment {
   color: string;
 }
 
-/** Anneau (donut) animé avec légende — pour le pipeline de candidatures. */
+/** Anneau (donut) animé avec légende, pour le pipeline de candidatures. */
 export function Donut({
   segments,
   size = 168,

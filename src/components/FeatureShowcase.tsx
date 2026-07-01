@@ -52,7 +52,7 @@ export function FeatureShowcase({
       tag: "GitHub",
       tagClass: "text-emerald-300 ring-emerald-400/25 bg-emerald-400/10",
       title: "La preuve par le code",
-      desc: "Chaque compétence est appuyée par de vrais extraits de code tirés des dépôts publics — la preuve, pas la promesse.",
+      desc: "Chaque compétence est appuyée par de vrais extraits de code tirés des dépôts publics : la preuve, pas la promesse.",
       icon: iconWrap(
         <>
           <polyline points="16 18 22 12 16 6" />

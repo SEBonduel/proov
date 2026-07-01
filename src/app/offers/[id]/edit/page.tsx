@@ -28,7 +28,7 @@ export default async function EditOfferPage({
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">Éditer l'offre</h1>
           <p className="mt-1.5 text-slate-400">
-            Modifiez le poste ou ses compétences — Proov recalcule
+            Modifiez le poste ou ses compétences, et Proov recalcule
             instantanément le classement des candidats.
           </p>
         </div>

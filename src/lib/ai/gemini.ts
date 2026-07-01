@@ -3,13 +3,11 @@ import { z } from "zod";
 import type { GitHubProfileData } from "@/lib/github";
 import type { ExtractionResult, SkillExtractor } from "./types";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Extracteur Gemini (Google AI Studio — offre gratuite)
+// Extracteur Gemini (Google AI Studio, offre gratuite)
 //
-// On envoie à Gemini un résumé FACTUEL et compact du profil GitHub, et on lui
-// demande d'en déduire des compétences PROUVÉES (jamais inventées) au format JSON
+// On envoie à Gemini un résumé factuel et compact du profil GitHub, et on lui
+// demande d'en déduire des compétences prouvées (jamais inventées) au format JSON
 // structuré. La sortie est strictement validée avant d'être utilisée.
-// ─────────────────────────────────────────────────────────────────────────────
 
 const SKILL_CATEGORIES = ["LANGUAGE", "FRAMEWORK", "TOOL", "DATABASE", "DOMAIN"] as const;
 

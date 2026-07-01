@@ -14,7 +14,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Proov — le recrutement par la preuve du code",
+  title: "Proov, le recrutement par la preuve du code",
   description:
     "Proov classe les candidats pour vos offres à partir de compétences vérifiées dans leur code GitHub, avec un score explicable.",
 };
@@ -110,7 +110,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
         <footer className="border-t border-white/10">
           <div className="mx-auto max-w-6xl px-6 py-5 text-center font-mono text-xs text-slate-600">
-            Proov — la preuve par le code, pas les promesses du CV.
+            Proov. La preuve par le code, pas les promesses du CV.
           </div>
         </footer>
       </body>

@@ -4,7 +4,7 @@ import { useFormStatus } from "react-dom";
 import { Spinner } from "@/components/Spinner";
 
 // Bouton de connexion GitHub avec état de chargement (lit le statut du <form>
-// parent via useFormStatus) — affiche un spinner pendant la redirection OAuth.
+// parent via useFormStatus). Affiche un spinner pendant la redirection OAuth.
 export function GitHubSignInButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (

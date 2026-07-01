@@ -4,7 +4,7 @@ import { getRecruiterStats } from "@/lib/queries";
 import { HBarChart, Donut } from "@/components/stats-charts";
 import { Reveal } from "@/components/Reveal";
 
-export const metadata = { title: "Statistiques — Proov" };
+export const metadata = { title: "Statistiques · Proov" };
 
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (

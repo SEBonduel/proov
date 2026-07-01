@@ -1,14 +1,12 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { z } from "zod";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Kit d'entretien généré par l'IA
 //
-// À partir des compétences PROUVÉES et des projets réels du candidat, on génère
+// À partir des compétences prouvées et des projets réels du candidat, on génère
 // des questions d'entretien ciblées (pas génériques) : chaque question s'ancre
 // dans son code, avec ce qu'une bonne réponse devrait contenir. Repli
 // déterministe si l'IA est indisponible (quota, réseau).
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface InterviewQuestion {
   skill: string;

@@ -67,7 +67,7 @@ export function OfferForm({ offer }: { offer?: OfferInit }) {
           <div>
             <label className={labelClass} htmlFor="title">Intitulé du poste</label>
             <input id="title" name="title" required defaultValue={offer?.title} className={`${inputClass} w-full`}
-              placeholder="Alternance — Développeur·se Frontend React" />
+              placeholder="Développeur·se Frontend React en alternance" />
           </div>
           <div>
             <label className={labelClass} htmlFor="description">Description</label>
@@ -113,7 +113,7 @@ export function OfferForm({ offer }: { offer?: OfferInit }) {
           <h2 className="font-mono text-xs uppercase tracking-wider text-slate-500">
             compétences requises
           </h2>
-          <span className="font-mono text-xs text-slate-600">poids 1–5 · « requis » = obligatoire</span>
+          <span className="font-mono text-xs text-slate-600">poids 1-5 · « requis » = obligatoire</span>
         </div>
 
         <div className="space-y-2.5">

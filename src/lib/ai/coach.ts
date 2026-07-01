@@ -13,7 +13,7 @@ function ruleBased(gap: SkillGap[]): string {
     .slice(0, 3)
     .map((g) => `${g.name} (${g.offers} offre${g.offers > 1 ? "s" : ""})`)
     .join(", ");
-  return `Pour matcher davantage d'offres, concentrez-vous sur : ${top}. Ces compétences reviennent souvent dans les offres ouvertes et ne sont pas encore prouvées dans votre code — un projet public les démontrant ferait grimper vos scores.`;
+  return `Pour matcher davantage d'offres, concentrez-vous sur : ${top}. Ces compétences reviennent souvent dans les offres ouvertes et ne sont pas encore prouvées dans votre code. Un projet public les démontrant ferait grimper vos scores.`;
 }
 
 export async function generateCoaching(params: {

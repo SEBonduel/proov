@@ -1,14 +1,12 @@
 import { codeToHtml } from "shiki";
 import { createOctokit } from "@/lib/github";
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Preuve par le code
 //
-// À la demande, on retrouve dans le code PUBLIC du candidat les extraits réels
+// À la demande, on retrouve dans le code public du candidat les extraits réels
 // qui attestent une compétence (recherche de code GitHub), et on les met en forme
 // avec coloration syntaxique. C'est l'incarnation littérale de « la preuve par
 // le code » : le recruteur voit d'où vient le score, pas juste un chiffre.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface EvidenceSnippet {
   repo: string;
@@ -111,7 +109,7 @@ function searchTerm(skill: string): string {
 /**
  * Recherche les extraits de code réels prouvant une compétence chez un candidat.
  * Retourne [] si la recherche de code GitHub est indisponible (token absent,
- * quota, ou aucun résultat) — l'appelant retombe alors sur les liens de repos.
+ * quota, ou aucun résultat), l'appelant retombe alors sur les liens de repos.
  */
 export async function fetchCodeEvidence(
   login: string,

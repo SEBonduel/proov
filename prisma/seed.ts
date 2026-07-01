@@ -4,7 +4,7 @@ import { storeCandidateFromProfile, ingestGitHubUser } from "../src/lib/candidat
 import { recomputeMatchesForOffer } from "../src/lib/matches";
 import { FIXTURE_PROFILES } from "./fixtures";
 
-// Pseudos GitHub réels ingérés EN PLUS des fixtures si un GITHUB_TOKEN est fourni.
+// Pseudos GitHub réels ingérés en plus des fixtures si un GITHUB_TOKEN est fourni.
 // Personnalisable via SEED_GITHUB_LOGINS (liste séparée par des virgules dans .env).
 // (Sans token, on évite la limite de 60 req/h en s'appuyant sur les fixtures.)
 const REAL_GITHUB_LOGINS = (
@@ -60,7 +60,7 @@ async function seedRecruiterAndOffers() {
 
   const offers = [
     {
-      title: "Alternance — Développeur·se Frontend React",
+      title: "Développeur·se Frontend React en alternance",
       description:
         "Rejoignez notre équipe produit pour construire des interfaces React/Next.js performantes et accessibles, avec un design system maison.",
       location: "Lyon",
@@ -75,7 +75,7 @@ async function seedRecruiterAndOffers() {
       ],
     },
     {
-      title: "Alternance — Développeur·se Backend Node / PostgreSQL",
+      title: "Développeur·se Backend Node / PostgreSQL en alternance",
       description:
         "Conception et développement d'APIs robustes (NestJS/Express), modélisation PostgreSQL, conteneurisation Docker.",
       location: "Paris",
@@ -91,7 +91,7 @@ async function seedRecruiterAndOffers() {
       ],
     },
     {
-      title: "Alternance — Ingénieur·e Data / IA (Python)",
+      title: "Ingénieur·e Data / IA (Python) en alternance",
       description:
         "Mise en place de pipelines de machine learning, modèles NLP/vision, et exposition via FastAPI.",
       location: "Toulouse",

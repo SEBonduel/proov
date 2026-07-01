@@ -7,7 +7,7 @@ interface Candidate {
   id: string;
   name: string;
   score: number;
-  values: number[]; // une valeur (0–100) par axe, dans l'ordre de `axes`
+  values: number[]; // une valeur (0-100) par axe, dans l'ordre de `axes`
 }
 
 const SERIES_COLORS = ["#34d399", "#a78bfa", "#fbbf24"];

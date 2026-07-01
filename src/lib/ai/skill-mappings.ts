@@ -1,7 +1,7 @@
 import type { SkillCategory } from "./types";
 
 // Dictionnaire de détection : nom de dépendance (par écosystème) → compétence
-// normalisée + catégorie. Utilisé par le fallback déterministe pour PROUVER
+// normalisée + catégorie. Utilisé par le fallback déterministe pour prouver
 // frameworks, outils et bases à partir des manifestes réels des repos.
 // Volontairement ciblé sur les technos courantes (qualité > exhaustivité).
 

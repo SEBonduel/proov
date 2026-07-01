@@ -100,7 +100,7 @@ export default async function MePage() {
       <Reveal delay={0.05}>
         <section className="rounded-2xl p-6 panel">
           <h2 className="mb-3 font-mono text-xs uppercase tracking-wider text-slate-500">
-            coaching — compétences à acquérir
+            coaching : compétences à acquérir
           </h2>
           {gap.length > 0 ? (
             <>
@@ -118,7 +118,7 @@ export default async function MePage() {
                 ))}
               </div>
               <p className="mt-3 text-xs text-slate-500">
-                Acquérir ces compétences — et les prouver par du code — débloquerait davantage d'offres.
+                Acquérir ces compétences (et les prouver par du code) débloquerait davantage d'offres.
               </p>
               <div className="mt-4">
                 <CoachButton />
@@ -138,7 +138,7 @@ export default async function MePage() {
             mes préférences
           </h2>
           <p className="mb-5 text-sm text-slate-400">
-            Indiquez vos attentes — elles sont visibles par les recruteurs qui consultent votre profil.
+            Indiquez vos attentes, elles sont visibles par les recruteurs qui consultent votre profil.
           </p>
           <PreferencesForm
             initial={{

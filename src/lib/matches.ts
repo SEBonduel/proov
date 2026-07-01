@@ -7,7 +7,7 @@ import type { Prisma } from "@/generated/prisma/client";
 // compétences requises (table RequiredSkill). Le calcul est déterministe.
 
 /**
- * (Re)calcule les matchs de TOUS les candidats pour une offre donnée et les
+ * (Re)calcule les matchs de tous les candidats pour une offre donnée et les
  * stocke (upsert). Retourne le nombre de matchs calculés.
  */
 export async function recomputeMatchesForOffer(offerId: string): Promise<number> {

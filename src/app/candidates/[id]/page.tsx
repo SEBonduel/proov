@@ -223,7 +223,7 @@ export default async function CandidatePage({
               kit d'entretien
             </h2>
             <p className="mb-4 text-sm text-slate-400">
-              Des questions générées à partir de ses compétences prouvées et de ses vrais projets —
+              Des questions générées à partir de ses compétences prouvées et de ses vrais projets,
               pour un entretien technique ciblé.
             </p>
             <InterviewKit candidateId={candidate.id} />

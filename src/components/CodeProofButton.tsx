@@ -35,12 +35,12 @@ export function CodeProofButton({ skillId, skillName }: { skillId: string; skill
             </div>
           ))}
           <p className="font-mono text-[10px] text-slate-600">
-            Extraits réels trouvés dans le code public via la recherche GitHub — preuve directe de « {skillName} ».
+            Extraits réels trouvés dans le code public via la recherche GitHub, preuve directe de « {skillName} ».
           </p>
         </div>
       ) : state.empty ? (
         <p className="font-mono text-[11px] text-slate-500">
-          Aucun extrait indexé par GitHub pour cette compétence — voir les dépôts ci-dessus.
+          Aucun extrait indexé par GitHub pour cette compétence, voir les dépôts ci-dessus.
         </p>
       ) : (
         <form action={formAction}>

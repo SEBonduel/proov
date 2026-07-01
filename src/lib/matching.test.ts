@@ -58,7 +58,7 @@ describe("computeMatch", () => {
 
   it("plafonne le score si une compétence obligatoire manque", () => {
     // React fortement prouvé (gros poids) → score naturel élevé, mais Docker est
-    // un must-have absent (petit poids) → le score DOIT être plafonné quand même.
+    // un must-have absent (petit poids) → le score doit être plafonné quand même.
     const required: RequiredSkillInput[] = [
       { name: "React", weight: 5, mustHave: true },
       { name: "Docker", weight: 1, mustHave: true }, // absente

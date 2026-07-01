@@ -11,7 +11,7 @@ export type SkillCategory =
 export interface ExtractedSkill {
   name: string;
   category: SkillCategory;
-  /** Force de la preuve 0–100, tirée du code (pas déclarée). */
+  /** Force de la preuve 0-100, tirée du code (pas déclarée). */
   proofStrength: number;
   /** Récence d'usage en mois (0 = très récent). */
   recencyMonths: number;
@@ -23,7 +23,7 @@ export interface ExtractedSkill {
 
 export interface ExtractionResult {
   skills: ExtractedSkill[];
-  /** Mini-pitch synthétique du candidat (2–3 phrases). */
+  /** Mini-pitch synthétique du candidat (2-3 phrases). */
   summary: string;
   /** Nom du fournisseur ayant produit l'analyse (traçabilité). */
   provider: string;

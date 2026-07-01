@@ -7,8 +7,8 @@ import { NON_SKILL_LANGUAGES } from "@/lib/ai/skill-mappings";
 import type { Prisma } from "@/generated/prisma/client";
 
 // Service candidat : transforme un profil GitHub (réel ou fourni) en un candidat
-// stocké avec ses compétences vérifiées. L'analyse IA est faite ICI (au seed /
-// à l'ingestion) puis mise en cache en base — la consultation ne rappelle jamais l'IA.
+// stocké avec ses compétences vérifiées. L'analyse IA est faite ici (au seed /
+// à l'ingestion) puis mise en cache en base, la consultation ne rappelle jamais l'IA.
 
 /**
  * Persiste un candidat à partir de données GitHub déjà récupérées : lance

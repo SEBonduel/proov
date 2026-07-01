@@ -7,7 +7,7 @@ import {
 import type { Prisma } from "@/generated/prisma/client";
 
 // Recherche de candidats en langage naturel. Sémantique (embeddings) si l'IA est
-// disponible, sinon repli mots-clés — pour que la fonctionnalité marche toujours.
+// disponible, sinon repli mots-clés, pour que la recherche fonctionne toujours.
 
 export interface SearchResult {
   id: string;
@@ -16,7 +16,7 @@ export interface SearchResult {
   location: string | null;
   activityScore: number;
   topSkills: string[];
-  score: number; // 0–100
+  score: number; // 0-100
 }
 
 export interface SearchResponse {
@@ -81,7 +81,7 @@ function toResult(c: CandidateRow, score: number): SearchResult {
   };
 }
 
-/** Score mots-clés 0–100 : proportion des termes de la requête retrouvés dans le profil. */
+/** Score mots-clés 0-100 : proportion des termes de la requête retrouvés dans le profil. */
 function keywordScore(c: CandidateRow, terms: string[]): number {
   if (terms.length === 0) return 0;
   const raw = (c.rawData as RawData | null) ?? {};

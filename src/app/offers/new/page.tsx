@@ -14,7 +14,7 @@ export default async function NewOfferPage() {
         <div>
           <h1 className="text-2xl font-bold sm:text-3xl">Nouvelle offre</h1>
           <p className="mt-1.5 text-slate-400">
-            Décrivez le poste et ses compétences requises — Proov classe
+            Décrivez le poste et ses compétences requises, et Proov classe
             instantanément vos candidats par preuve de compétence.
           </p>
         </div>
