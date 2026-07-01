@@ -57,6 +57,8 @@ function compactProfile(profile: GitHubProfileData) {
       stars: r.stars,
       topics: r.topics,
       pushedAt: r.pushedAt,
+      // Repo de contribution (code d'autrui) : preuve plus faible qu'un projet perso.
+      contribution: r.isContributed ?? false,
       dependencies: r.manifests.flatMap((m) => m.dependencies).slice(0, 40),
     })),
   };

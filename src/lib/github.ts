@@ -33,6 +33,10 @@ export interface RepoSignal {
   createdAt: string | null;
   manifests: RepoManifestDeps[];
   readmeExcerpt: string | null;
+  /** true si le candidat a CONTRIBUÉ au repo sans en être le propriétaire. */
+  isContributed?: boolean;
+  /** propriétaire du repo (utile pour les repos de contribution). */
+  owner?: string;
 }
 
 export interface GitHubProfileData {
@@ -66,6 +70,8 @@ export interface FetchOptions {
   maxRepos?: number;
   /** Inclure l'analyse des manifestes de dépendances (coûteux en appels API). */
   includeManifests?: boolean;
+  /** Nombre maximum de repos de CONTRIBUTION (repos publics d'autrui où le candidat a commité). */
+  maxContributed?: number;
   /** Callback de progression (analyse live). */
   onProgress?: (event: FetchProgress) => void | Promise<void>;
 }
@@ -73,7 +79,8 @@ export interface FetchOptions {
 const DEFAULT_OPTIONS = {
   maxRepos: 12,
   includeManifests: true,
-} satisfies Pick<FetchOptions, "maxRepos" | "includeManifests">;
+  maxContributed: 5,
+} satisfies Pick<FetchOptions, "maxRepos" | "includeManifests" | "maxContributed">;
 
 /**
  * Manifestes connus → écosystème. On tente de lire ces fichiers à la racine de
@@ -245,6 +252,83 @@ async function fetchRepoManifests(
   return results;
 }
 
+/**
+ * Repos PUBLICS d'autrui auxquels le candidat a contribué (commits signés de son
+ * pseudo). Signal fort : contribuer à un projet open source qu'on ne possède pas.
+ * Retourne [] si la recherche est indisponible (token absent, quota…).
+ */
+async function fetchContributedRepos(
+  octokit: Octokit,
+  login: string,
+  maxContributed: number,
+): Promise<RepoSignal[]> {
+  if (maxContributed <= 0) return [];
+
+  let fullNames: string[] = [];
+  try {
+    const res = await octokit.request("GET /search/commits", {
+      q: `author:${login}`,
+      sort: "author-date",
+      order: "desc",
+      per_page: 60,
+    });
+    const items = (res.data.items ?? []) as Array<{
+      repository?: { full_name?: string; owner?: { login?: string }; fork?: boolean };
+    }>;
+    const seen = new Set<string>();
+    for (const it of items) {
+      const repo = it.repository;
+      if (!repo?.full_name || !repo.owner?.login) continue;
+      // On ne garde que les repos d'AUTRUI (contribution réelle) et non des forks.
+      if (repo.owner.login.toLowerCase() === login.toLowerCase()) continue;
+      if (repo.fork) continue;
+      if (seen.has(repo.full_name)) continue;
+      seen.add(repo.full_name);
+      fullNames.push(repo.full_name);
+    }
+  } catch {
+    return [];
+  }
+
+  fullNames = fullNames.slice(0, maxContributed);
+  const repos: RepoSignal[] = [];
+  for (const fullName of fullNames) {
+    const [owner, repo] = fullName.split("/");
+    try {
+      const { data: r } = await octokit.repos.get({ owner, repo });
+      let languages: Record<string, number> = {};
+      try {
+        languages = (await octokit.repos.listLanguages({ owner, repo })).data as Record<string, number>;
+      } catch {
+        // ignore
+      }
+      repos.push({
+        name: r.name,
+        fullName: r.full_name,
+        url: r.html_url,
+        description: r.description,
+        primaryLanguage: r.language ?? Object.keys(languages)[0] ?? null,
+        languages,
+        topics: r.topics ?? [],
+        stars: r.stargazers_count ?? 0,
+        forks: r.forks_count ?? 0,
+        sizeKb: r.size ?? 0,
+        isFork: Boolean(r.fork),
+        isArchived: Boolean(r.archived),
+        pushedAt: r.pushed_at ?? null,
+        createdAt: r.created_at ?? null,
+        manifests: [],
+        readmeExcerpt: null,
+        isContributed: true,
+        owner,
+      });
+    } catch {
+      // repo devenu privé/supprimé : on ignore
+    }
+  }
+  return repos;
+}
+
 async function fetchReadmeExcerpt(
   octokit: Octokit,
   owner: string,
@@ -338,7 +422,9 @@ export async function fetchGitHubProfile(
     });
   }
 
-  // Agrégation des octets de code par langage sur tous les repos retenus.
+  // Agrégation des octets de code par langage sur les repos DU CANDIDAT
+  // uniquement (on ne compte pas le code des repos de contribution, qu'il n'a
+  // pas entièrement écrit — cela fausserait la répartition des langages).
   const languageTotals: Record<string, number> = {};
   for (const repo of repos) {
     for (const [lang, bytes] of Object.entries(repo.languages)) {
@@ -347,6 +433,13 @@ export async function fetchGitHubProfile(
   }
 
   await emit({ type: "languages", languages: languageTotals });
+
+  // Repos publics d'autrui auxquels le candidat a contribué (affichés à part).
+  const ownedNames = new Set(repos.map((r) => r.fullName));
+  const contributed = (await fetchContributedRepos(octokit, login, opts.maxContributed)).filter(
+    (r) => !ownedNames.has(r.fullName),
+  );
+  repos.push(...contributed);
 
   return {
     login: user.login,

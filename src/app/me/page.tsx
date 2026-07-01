@@ -8,6 +8,7 @@ import {
   getSkillGapForCandidate,
 } from "@/lib/queries";
 import { CoachButton } from "@/components/CoachButton";
+import { PreferencesForm } from "@/components/PreferencesForm";
 import {
   Avatar,
   ProofBar,
@@ -128,6 +129,27 @@ export default async function MePage() {
               Vous couvrez déjà les compétences requises par les offres ouvertes 🎉
             </p>
           )}
+        </section>
+      </Reveal>
+
+      <Reveal delay={0.05}>
+        <section className="rounded-2xl p-6 panel">
+          <h2 className="mb-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+            mes préférences
+          </h2>
+          <p className="mb-5 text-sm text-slate-400">
+            Indiquez vos attentes — elles sont visibles par les recruteurs qui consultent votre profil.
+          </p>
+          <PreferencesForm
+            initial={{
+              openToWork: candidate.openToWork,
+              remotePref: candidate.remotePref,
+              preferredLocation: candidate.preferredLocation,
+              maxDistanceKm: candidate.maxDistanceKm,
+              contractPrefs: candidate.contractPrefs,
+              availability: candidate.availability,
+            }}
+          />
         </section>
       </Reveal>
 

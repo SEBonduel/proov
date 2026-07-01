@@ -557,6 +557,61 @@ export async function searchCandidatesAction(
   return { results, mode, query };
 }
 
+export type PreferencesState = { ok?: boolean; error?: string };
+
+const CONTRACT_VALUES = ["ALTERNANCE", "STAGE", "CDI", "CDD", "FREELANCE"] as const;
+const REMOTE_VALUES = ["ONSITE", "HYBRID", "REMOTE"] as const;
+
+const prefsSchema = z.object({
+  openToWork: z.boolean(),
+  remotePref: z.enum(REMOTE_VALUES).nullable(),
+  preferredLocation: z.string().trim().max(80).nullable(),
+  maxDistanceKm: z.number().int().min(0).max(20000).nullable(),
+  contractPrefs: z.array(z.enum(CONTRACT_VALUES)),
+  availability: z.string().trim().max(80).nullable(),
+});
+
+/** Le candidat met à jour ses préférences (télétravail, mobilité, contrats). */
+export async function updatePreferences(
+  _prev: PreferencesState,
+  formData: FormData,
+): Promise<PreferencesState> {
+  const user = await requireUser();
+  if (user.role !== "CANDIDATE") return { error: "Réservé aux candidats." };
+  const candidate = await prisma.candidate.findUnique({ where: { userId: user.id } });
+  if (!candidate) return { error: "Profil candidat introuvable." };
+
+  const remoteRaw = String(formData.get("remotePref") ?? "");
+  const distRaw = String(formData.get("maxDistanceKm") ?? "").trim();
+  const locRaw = String(formData.get("preferredLocation") ?? "").trim();
+  const availRaw = String(formData.get("availability") ?? "").trim();
+
+  const parsed = prefsSchema.safeParse({
+    openToWork: formData.get("openToWork") === "on",
+    remotePref: REMOTE_VALUES.includes(remoteRaw as (typeof REMOTE_VALUES)[number]) ? remoteRaw : null,
+    preferredLocation: locRaw || null,
+    maxDistanceKm: distRaw ? Number(distRaw) : null,
+    contractPrefs: formData.getAll("contractPrefs").map(String),
+    availability: availRaw || null,
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Formulaire invalide." };
+  const d = parsed.data;
+
+  await prisma.candidate.update({
+    where: { id: candidate.id },
+    data: {
+      openToWork: d.openToWork,
+      remotePref: d.remotePref,
+      preferredLocation: d.preferredLocation,
+      maxDistanceKm: d.maxDistanceKm,
+      contractPrefs: d.contractPrefs,
+      availability: d.availability,
+    },
+  });
+  revalidatePath("/me");
+  return { ok: true };
+}
+
 export type ApplyState = { applied?: boolean; error?: string };
 
 /** Un candidat postule à une offre : on (re)calcule son match et on date la candidature. */

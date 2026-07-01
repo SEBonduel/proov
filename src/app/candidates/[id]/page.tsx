@@ -10,6 +10,19 @@ import { CodeProofButton } from "@/components/CodeProofButton";
 
 const CATEGORY_ORDER = ["LANGUAGE", "FRAMEWORK", "DATABASE", "TOOL", "DOMAIN"];
 
+const REMOTE_LABEL: Record<string, string> = {
+  ONSITE: "Sur site",
+  HYBRID: "Hybride",
+  REMOTE: "Télétravail total",
+};
+const CONTRACT_LABEL: Record<string, string> = {
+  ALTERNANCE: "Alternance",
+  STAGE: "Stage",
+  CDI: "CDI",
+  CDD: "CDD",
+  FREELANCE: "Freelance",
+};
+
 export default async function CandidatePage({
   params,
 }: {
@@ -30,8 +43,37 @@ export default async function CandidatePage({
     skills: candidate.skills.filter((s) => s.category === cat),
   })).filter((g) => g.skills.length > 0);
 
-  const languages =
-    (candidate.rawData as { languageTotals?: Record<string, number> } | null)?.languageTotals ?? {};
+  const rawData = candidate.rawData as {
+    languageTotals?: Record<string, number>;
+    repos?: {
+      name: string;
+      fullName: string;
+      url: string;
+      description: string | null;
+      primaryLanguage: string | null;
+      stars: number;
+      isContributed?: boolean;
+    }[];
+  } | null;
+  const languages = rawData?.languageTotals ?? {};
+
+  // Projets : d'abord ceux du candidat (par étoiles), puis ses contributions.
+  const repos = (rawData?.repos ?? [])
+    .slice()
+    .sort(
+      (a, b) =>
+        Number(a.isContributed ?? false) - Number(b.isContributed ?? false) ||
+        (b.stars ?? 0) - (a.stars ?? 0),
+    )
+    .slice(0, 9);
+
+  const hasPrefs =
+    !candidate.openToWork ||
+    Boolean(candidate.remotePref) ||
+    Boolean(candidate.preferredLocation) ||
+    candidate.maxDistanceKm != null ||
+    candidate.contractPrefs.length > 0 ||
+    Boolean(candidate.availability);
 
   return (
     <div className="space-y-10">
@@ -77,6 +119,53 @@ export default async function CandidatePage({
         </Reveal>
       ) : null}
 
+      {hasPrefs ? (
+        <Reveal delay={0.07}>
+          <section className="rounded-2xl p-6 panel">
+            <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-500">
+              préférences
+            </h2>
+            <div className="flex flex-wrap gap-2.5">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-xs ring-1 ${
+                  candidate.openToWork
+                    ? "bg-emerald-400/10 text-emerald-300 ring-emerald-400/25"
+                    : "bg-white/5 text-slate-400 ring-white/10"
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${candidate.openToWork ? "bg-emerald-400" : "bg-slate-500"}`} />
+                {candidate.openToWork ? "Ouvert aux opportunités" : "Pas activement en recherche"}
+              </span>
+              {candidate.remotePref ? (
+                <span className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300 ring-1 ring-white/10">
+                  {REMOTE_LABEL[candidate.remotePref] ?? candidate.remotePref}
+                </span>
+              ) : null}
+              {candidate.preferredLocation ? (
+                <span className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300 ring-1 ring-white/10">
+                  📍 {candidate.preferredLocation}
+                  {candidate.maxDistanceKm != null ? ` · ≤ ${candidate.maxDistanceKm} km` : ""}
+                </span>
+              ) : candidate.maxDistanceKm != null ? (
+                <span className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300 ring-1 ring-white/10">
+                  ≤ {candidate.maxDistanceKm} km
+                </span>
+              ) : null}
+              {candidate.availability ? (
+                <span className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300 ring-1 ring-white/10">
+                  dispo : {candidate.availability}
+                </span>
+              ) : null}
+              {candidate.contractPrefs.map((c) => (
+                <span key={c} className="rounded-lg bg-white/5 px-2.5 py-1 font-mono text-xs text-slate-300 ring-1 ring-white/10">
+                  {CONTRACT_LABEL[c] ?? c}
+                </span>
+              ))}
+            </div>
+          </section>
+        </Reveal>
+      ) : null}
+
       {Object.keys(languages).length > 0 ? (
         <Reveal delay={0.08}>
           <section className="rounded-2xl p-6 panel">
@@ -84,6 +173,45 @@ export default async function CandidatePage({
               répartition des langages
             </h2>
             <LanguageBar languages={languages} />
+          </section>
+        </Reveal>
+      ) : null}
+
+      {repos.length > 0 ? (
+        <Reveal delay={0.09}>
+          <section className="rounded-2xl p-6 panel">
+            <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-500">
+              projets
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {repos.map((r) => (
+                <a
+                  key={r.fullName}
+                  href={r.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex h-full flex-col rounded-xl border border-white/10 bg-white/[0.02] p-4 transition hover:border-emerald-400/40"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="truncate font-mono text-sm text-slate-200 group-hover:text-emerald-300">
+                      {r.isContributed ? r.fullName : r.name}
+                    </span>
+                    {r.isContributed ? (
+                      <span className="shrink-0 rounded bg-cyan-400/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-cyan-300 ring-1 ring-cyan-400/25">
+                        contributeur
+                      </span>
+                    ) : null}
+                  </div>
+                  {r.description ? (
+                    <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-400">{r.description}</p>
+                  ) : null}
+                  <div className="mt-auto flex items-center gap-3 pt-3 font-mono text-[11px] text-slate-600">
+                    {r.primaryLanguage ? <span>{r.primaryLanguage}</span> : null}
+                    {r.stars > 0 ? <span>★ {r.stars}</span> : null}
+                  </div>
+                </a>
+              ))}
+            </div>
           </section>
         </Reveal>
       ) : null}
