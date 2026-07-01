@@ -11,6 +11,7 @@ import { computeMatch, type MatchResult } from "@/lib/matching";
 import { generateMatchExplanation } from "@/lib/ai/explain";
 import { generateCoaching } from "@/lib/ai/coach";
 import { generateInterviewKit, type InterviewKit } from "@/lib/ai/interview";
+import { fetchCodeEvidence, type EvidenceSnippet } from "@/lib/code-evidence";
 import { getSkillGapForCandidate } from "@/lib/queries";
 import { ingestGitHubUser } from "@/lib/candidates";
 import { requireUser, requireRecruiter } from "@/lib/auth-helpers";
@@ -498,6 +499,42 @@ export async function generateInterviewKitAction(
     });
   }
   return { kit };
+}
+
+export type EvidenceState = { snippets?: EvidenceSnippet[]; empty?: boolean; error?: string };
+
+/**
+ * Retrouve (et met en cache) les extraits de code réels prouvant une compétence.
+ * Accessible au recruteur, ou au candidat sur son propre profil.
+ */
+export async function getCodeEvidence(
+  _prev: EvidenceState,
+  formData: FormData,
+): Promise<EvidenceState> {
+  const user = await requireUser();
+  const skillId = String(formData.get("skillId") ?? "");
+
+  const skill = await prisma.candidateSkill.findUnique({
+    where: { id: skillId },
+    include: { candidate: { select: { githubLogin: true, userId: true } } },
+  });
+  if (!skill) return { error: "Compétence introuvable." };
+
+  const isRecruiter = user.role === "RECRUITER" || user.role === "ADMIN";
+  if (!isRecruiter && skill.candidate.userId !== user.id) return { error: "Accès refusé." };
+
+  if (skill.codeEvidence) {
+    return { snippets: skill.codeEvidence as unknown as EvidenceSnippet[] };
+  }
+
+  const snippets = await fetchCodeEvidence(skill.candidate.githubLogin, skill.name);
+  if (snippets.length === 0) return { empty: true };
+
+  await prisma.candidateSkill.update({
+    where: { id: skillId },
+    data: { codeEvidence: snippets as unknown as Prisma.InputJsonValue },
+  });
+  return { snippets };
 }
 
 export type ApplyState = { applied?: boolean; error?: string };

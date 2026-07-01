@@ -6,6 +6,7 @@ import { Avatar, ProofBar, categoryLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 import { LanguageBar } from "@/components/LanguageBar";
 import { InterviewKit } from "@/components/InterviewKit";
+import { CodeProofButton } from "@/components/CodeProofButton";
 
 const CATEGORY_ORDER = ["LANGUAGE", "FRAMEWORK", "DATABASE", "TOOL", "DOMAIN"];
 
@@ -144,6 +145,7 @@ export default async function CandidatePage({
                         ))}
                       </div>
                     ) : null}
+                    <CodeProofButton skillId={s.id} skillName={s.name} />
                   </div>
                 ))}
               </div>

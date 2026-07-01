@@ -98,3 +98,15 @@ body {
     cursor: not-allowed;
   }
 }
+
+/* Extraits de code colorisés par shiki (preuve par le code). */
+.code-proof pre.shiki {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  background: #0a0d13 !important;
+  white-space: pre;
+  tab-size: 2;
+}
+.code-proof pre.shiki code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
