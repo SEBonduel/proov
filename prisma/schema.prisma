@@ -107,6 +107,12 @@ model Candidate {
   // Synthèse générée par l'IA (mini-pitch du candidat)
   aiSummary String?
 
+  // Vecteur d'embedding du profil (recherche sémantique en langage naturel).
+  embedding Json?
+
+  // Kit d'entretien généré par l'IA (questions ciblées sur le vrai code), mis en cache.
+  interviewKit Json?
+
   // Score d'activité récente 0–100 (fraîcheur des contributions)
   activityScore Int @default(0)
 
@@ -147,6 +153,9 @@ model CandidateSkill {
   // Repos qui prouvent la compétence (URLs) + justification lisible par un humain
   evidenceRepos String[]
   reasoning     String?
+
+  // Extraits de code réels prouvant la compétence (cache de la recherche GitHub).
+  codeEvidence Json?
 
   @@unique([candidateId, name])
   @@index([name])

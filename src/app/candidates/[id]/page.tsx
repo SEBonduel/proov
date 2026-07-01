@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth-helpers";
 import { Avatar, ProofBar, categoryLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 import { LanguageBar } from "@/components/LanguageBar";
+import { InterviewKit } from "@/components/InterviewKit";
 
 const CATEGORY_ORDER = ["LANGUAGE", "FRAMEWORK", "DATABASE", "TOOL", "DOMAIN"];
 
@@ -82,6 +83,21 @@ export default async function CandidatePage({
               répartition des langages
             </h2>
             <LanguageBar languages={languages} />
+          </section>
+        </Reveal>
+      ) : null}
+
+      {isRecruiter && candidate.skills.length > 0 ? (
+        <Reveal delay={0.1}>
+          <section className="rounded-2xl p-6 panel">
+            <h2 className="mb-1 font-mono text-xs uppercase tracking-widest text-slate-500">
+              kit d'entretien
+            </h2>
+            <p className="mb-4 text-sm text-slate-400">
+              Des questions générées à partir de ses compétences prouvées et de ses vrais projets —
+              pour un entretien technique ciblé.
+            </p>
+            <InterviewKit candidateId={candidate.id} />
           </section>
         </Reveal>
       ) : null}

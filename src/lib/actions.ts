@@ -10,6 +10,7 @@ import { recomputeMatchesForOffer } from "@/lib/matches";
 import { computeMatch, type MatchResult } from "@/lib/matching";
 import { generateMatchExplanation } from "@/lib/ai/explain";
 import { generateCoaching } from "@/lib/ai/coach";
+import { generateInterviewKit, type InterviewKit } from "@/lib/ai/interview";
 import { getSkillGapForCandidate } from "@/lib/queries";
 import { ingestGitHubUser } from "@/lib/candidates";
 import { requireUser, requireRecruiter } from "@/lib/auth-helpers";
@@ -441,6 +442,62 @@ export async function explainMatch(_prev: ExplainState, formData: FormData): Pro
   await prisma.match.update({ where: { id: match.id }, data: { explanation } });
   revalidatePath(`/offers/${offerId}`);
   return { explanation };
+}
+
+export type InterviewState = { kit?: InterviewKit; error?: string };
+
+type RawRepo = {
+  name?: string;
+  description?: string | null;
+  primaryLanguage?: string | null;
+  topics?: string[];
+  manifests?: { dependencies?: string[] }[];
+};
+
+/** Génère (et met en cache) un kit d'entretien ciblé sur le code du candidat. Recruteur uniquement. */
+export async function generateInterviewKitAction(
+  _prev: InterviewState,
+  formData: FormData,
+): Promise<InterviewState> {
+  await requireRecruiter();
+  const candidateId = String(formData.get("candidateId") ?? "");
+
+  const candidate = await prisma.candidate.findUnique({
+    where: { id: candidateId },
+    include: { skills: { orderBy: { proofStrength: "desc" } } },
+  });
+  if (!candidate) return { error: "Candidat introuvable." };
+
+  // Cache : on ne rappelle pas l'IA si le kit a déjà été généré.
+  if (candidate.interviewKit) {
+    return { kit: candidate.interviewKit as unknown as InterviewKit };
+  }
+
+  const rawRepos = ((candidate.rawData as { repos?: RawRepo[] } | null)?.repos ?? []).map((r) => ({
+    name: r.name ?? "",
+    description: r.description ?? null,
+    primaryLanguage: r.primaryLanguage ?? null,
+    topics: r.topics ?? [],
+    dependencies: (r.manifests ?? []).flatMap((m) => m.dependencies ?? []),
+  }));
+
+  const kit = await generateInterviewKit({
+    candidateName: candidate.name ?? candidate.githubLogin,
+    skills: candidate.skills.map((s) => ({
+      name: s.name,
+      proofStrength: s.proofStrength,
+      reasoning: s.reasoning,
+    })),
+    repos: rawRepos,
+  });
+
+  if (kit.questions.length > 0) {
+    await prisma.candidate.update({
+      where: { id: candidate.id },
+      data: { interviewKit: kit as unknown as Prisma.InputJsonValue },
+    });
+  }
+  return { kit };
 }
 
 export type ApplyState = { applied?: boolean; error?: string };
