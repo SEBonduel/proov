@@ -15,9 +15,17 @@ import type { Prisma } from "@/generated/prisma/client";
  * l'extraction de compétences, puis upsert le candidat et remplace ses skills.
  * Retourne l'id du candidat.
  */
+export type StoreProgress =
+  | { type: "extracting" }
+  | { type: "skill"; name: string; category: string; proofStrength: number }
+  | { type: "summary"; text: string };
+
 export async function storeCandidateFromProfile(
   profile: GitHubProfileData,
+  opts: { onProgress?: (event: StoreProgress) => void | Promise<void> } = {},
 ): Promise<string> {
+  const emit = opts.onProgress ?? (() => {});
+  await emit({ type: "extracting" });
   const extraction = await extractSkills(profile);
   // Nettoyage centralisé (quel que soit le fournisseur) :
   //  - dédoublonnage par nom (contrainte unique candidateId+name)
@@ -26,6 +34,12 @@ export async function storeCandidateFromProfile(
   const skills = mergeDuplicateSkills(extraction.skills).filter(
     (s) => !NON_SKILL_LANGUAGES.has(s.name),
   );
+
+  // Les compétences émergent une à une dans l'UI (effet « analyse en direct »).
+  for (const s of [...skills].sort((a, b) => b.proofStrength - a.proofStrength)) {
+    await emit({ type: "skill", name: s.name, category: s.category, proofStrength: s.proofStrength });
+  }
+  await emit({ type: "summary", text: extraction.summary });
 
   const candidate = await prisma.candidate.upsert({
     where: { githubLogin: profile.login },

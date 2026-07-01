@@ -54,17 +54,26 @@ export interface GitHubProfileData {
   fetchedAt: string;
 }
 
+/** Événements de progression émis pendant l'ingestion (pour l'analyse live en streaming). */
+export type FetchProgress =
+  | { type: "profile"; login: string; name: string | null; publicRepos: number }
+  | { type: "repos"; total: number }
+  | { type: "repo"; name: string; index: number; total: number; language: string | null }
+  | { type: "languages"; languages: Record<string, number> };
+
 export interface FetchOptions {
   /** Nombre maximum de repos analysés (les plus récemment poussés, hors forks). */
   maxRepos?: number;
   /** Inclure l'analyse des manifestes de dépendances (coûteux en appels API). */
   includeManifests?: boolean;
+  /** Callback de progression (analyse live). */
+  onProgress?: (event: FetchProgress) => void | Promise<void>;
 }
 
-const DEFAULT_OPTIONS: Required<FetchOptions> = {
+const DEFAULT_OPTIONS = {
   maxRepos: 12,
   includeManifests: true,
-};
+} satisfies Pick<FetchOptions, "maxRepos" | "includeManifests">;
 
 /**
  * Manifestes connus → écosystème. On tente de lire ces fichiers à la racine de
@@ -262,9 +271,11 @@ export async function fetchGitHubProfile(
   options: FetchOptions = {},
 ): Promise<GitHubProfileData> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
+  const emit = opts.onProgress ?? (() => {});
   const octokit = createOctokit();
 
   const { data: user } = await octokit.users.getByUsername({ username: login });
+  await emit({ type: "profile", login: user.login, name: user.name ?? null, publicRepos: user.public_repos ?? 0 });
 
   // On récupère les repos publics, triés par push récent.
   const { data: allRepos } = await octokit.repos.listForUser({
@@ -278,8 +289,10 @@ export async function fetchGitHubProfile(
   const selected = allRepos
     .filter((r) => !r.fork)
     .slice(0, opts.maxRepos);
+  await emit({ type: "repos", total: selected.length });
 
   const repos: RepoSignal[] = [];
+  let scanned = 0;
   for (const r of selected) {
     let languages: Record<string, number> = {};
     try {
@@ -291,6 +304,14 @@ export async function fetchGitHubProfile(
     } catch {
       // ignore
     }
+    scanned += 1;
+    await emit({
+      type: "repo",
+      name: r.name,
+      index: scanned,
+      total: selected.length,
+      language: r.language ?? Object.keys(languages)[0] ?? null,
+    });
 
     const manifests = opts.includeManifests
       ? await fetchRepoManifests(octokit, login, r.name)
@@ -324,6 +345,8 @@ export async function fetchGitHubProfile(
       languageTotals[lang] = (languageTotals[lang] ?? 0) + bytes;
     }
   }
+
+  await emit({ type: "languages", languages: languageTotals });
 
   return {
     login: user.login,
