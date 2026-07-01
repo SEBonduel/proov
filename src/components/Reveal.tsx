@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 
-// Animation d'entrée : fondu + glissement vertical au moment où l'élément
-// apparaît dans le viewport (façon Linear / Framer).
+// Animation d'entrée : fondu + glissement vertical. Déclenchée au montage
+// (et non sur défilement) pour garantir que le contenu déjà visible au
+// chargement s'affiche toujours — sans page qui paraît vide avant un scroll.
 export function Reveal({
   children,
   delay = 0,
@@ -18,8 +19,7 @@ export function Reveal({
     <motion.div
       className={className}
       initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
