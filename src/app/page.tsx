@@ -4,6 +4,7 @@ import { getSessionUser } from "@/lib/auth-helpers";
 import { ScoreBadge, SkillChip, contractLabel } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
 import { AnimatedBackground } from "@/components/AnimatedBackground";
+import { FeatureShowcase } from "@/components/FeatureShowcase";
 
 export default async function DashboardPage() {
   const user = await getSessionUser();
@@ -40,6 +41,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      <FeatureShowcase isRecruiter={isRecruiter} isCandidate={user?.role === "CANDIDATE"} loggedIn={Boolean(user)} />
 
       <section>
         <Reveal>
