@@ -12,6 +12,7 @@ import { generateMatchExplanation } from "@/lib/ai/explain";
 import { generateCoaching } from "@/lib/ai/coach";
 import { generateInterviewKit, type InterviewKit } from "@/lib/ai/interview";
 import { fetchCodeEvidence, type EvidenceSnippet } from "@/lib/code-evidence";
+import { searchCandidates, type SearchResult } from "@/lib/search";
 import { getSkillGapForCandidate } from "@/lib/queries";
 import { ingestGitHubUser } from "@/lib/candidates";
 import { requireUser, requireRecruiter } from "@/lib/auth-helpers";
@@ -535,6 +536,25 @@ export async function getCodeEvidence(
     data: { codeEvidence: snippets as unknown as Prisma.InputJsonValue },
   });
   return { snippets };
+}
+
+export type SearchState = {
+  results?: SearchResult[];
+  mode?: "semantic" | "keyword";
+  query?: string;
+  error?: string;
+};
+
+/** Recherche de candidats en langage naturel (sémantique + repli mots-clés). Recruteur uniquement. */
+export async function searchCandidatesAction(
+  _prev: SearchState,
+  formData: FormData,
+): Promise<SearchState> {
+  await requireRecruiter();
+  const query = String(formData.get("query") ?? "").trim();
+  if (!query) return {};
+  const { results, mode } = await searchCandidates(query);
+  return { results, mode, query };
 }
 
 export type ApplyState = { applied?: boolean; error?: string };

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { fetchGitHubProfile, type GitHubProfileData } from "@/lib/github";
 import { extractSkills } from "@/lib/ai";
+import { embed, candidateEmbeddingText } from "@/lib/ai/embeddings";
 import { mergeDuplicateSkills } from "@/lib/ai/rule-based";
 import { NON_SKILL_LANGUAGES } from "@/lib/ai/skill-mappings";
 import type { Prisma } from "@/generated/prisma/client";
@@ -79,6 +80,34 @@ export async function storeCandidateFromProfile(
         reasoning: s.reasoning,
       })),
     });
+  }
+
+  // Embedding du profil pour la recherche sémantique (best-effort : si l'IA est
+  // indisponible, la recherche calculera l'embedding paresseusement plus tard).
+  try {
+    const vec = await embed(
+      candidateEmbeddingText({
+        name: profile.name,
+        githubLogin: profile.login,
+        aiSummary: extraction.summary,
+        bio: profile.bio,
+        skills: skills.map((s) => ({ name: s.name })),
+        languages: Object.keys(profile.languageTotals),
+        repos: profile.repos.map((r) => ({
+          name: r.name,
+          description: r.description,
+          topics: r.topics,
+        })),
+      }),
+    );
+    if (vec) {
+      await prisma.candidate.update({
+        where: { id: candidate.id },
+        data: { embedding: vec as unknown as Prisma.InputJsonValue },
+      });
+    }
+  } catch {
+    // non bloquant
   }
 
   return candidate.id;

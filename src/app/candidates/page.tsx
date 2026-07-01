@@ -3,6 +3,7 @@ import { getCandidates } from "@/lib/queries";
 import { requireRecruiter } from "@/lib/auth-helpers";
 import { Avatar, SkillChip } from "@/components/match-ui";
 import { Reveal } from "@/components/Reveal";
+import { CandidateSearch } from "@/components/CandidateSearch";
 
 export default async function CandidatesPage() {
   await requireRecruiter();
@@ -17,11 +18,12 @@ export default async function CandidatesPage() {
           </h1>
           <p className="mt-1 text-slate-400">
             <span className="text-slate-200">{candidates.length}</span> profils analysés
-            depuis leur code GitHub.
+            depuis leur code GitHub — cherchez en langage naturel.
           </p>
         </div>
       </Reveal>
 
+      <CandidateSearch>
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {candidates.map((c, i) => (
           <li key={c.id}>
@@ -50,6 +52,7 @@ export default async function CandidatesPage() {
           </li>
         ))}
       </ul>
+      </CandidateSearch>
     </div>
   );
 }
