@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getOffersOverview } from "@/lib/queries";
 import { getSessionUser } from "@/lib/auth-helpers";
 import { ScoreBadge, SkillChip, contractLabel } from "@/components/match-ui";
@@ -8,6 +9,8 @@ import { FeatureShowcase } from "@/components/FeatureShowcase";
 
 export default async function DashboardPage() {
   const user = await getSessionUser();
+  // Connecté mais sans rôle (onboarding abandonné) : on renvoie choisir un rôle.
+  if (user && !user.role) redirect("/onboarding");
   const isRecruiter = user?.role === "RECRUITER" || user?.role === "ADMIN";
   // Recruteur : ses offres uniquement. Sinon : vitrine publique des offres ouvertes.
   const offers = await getOffersOverview(isRecruiter ? user!.id : undefined);

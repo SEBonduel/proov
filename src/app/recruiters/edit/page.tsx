@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRecruiter } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { RecruiterProfileForm } from "@/components/RecruiterProfileForm";
+import { RoleSwitchButton } from "@/components/RoleSwitchButton";
 import { Reveal } from "@/components/Reveal";
 
 export default async function EditRecruiterProfilePage() {
@@ -24,6 +25,18 @@ export default async function EditRecruiterProfilePage() {
       </Reveal>
       <Reveal delay={0.05}>
         <RecruiterProfileForm initial={me ?? {}} />
+      </Reveal>
+
+      <Reveal delay={0.1}>
+        <section className="rounded-2xl p-6 panel">
+          <h2 className="mb-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+            compte
+          </h2>
+          <p className="mb-4 text-sm text-slate-400">
+            Vous cherchez un poste plutôt que des candidats ? Basculez en compte candidat : Proov analysera votre GitHub.
+          </p>
+          <RoleSwitchButton to="CANDIDATE" label="Passer en compte candidat" pendingText="Analyse de votre GitHub…" />
+        </section>
       </Reveal>
     </div>
   );

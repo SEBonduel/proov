@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   getOfferWithRanking,
   getOfferDetail,
@@ -69,6 +69,8 @@ export default async function OfferPage({
   const { id } = await params;
   const { filter } = await searchParams;
   const user = await getSessionUser();
+  // Connecté mais sans rôle : on renvoie choisir un rôle avant toute action.
+  if (user && !user.role) redirect("/onboarding");
 
   const offer = await getOfferDetail(id);
   if (!offer) notFound();

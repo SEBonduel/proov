@@ -9,6 +9,7 @@ import {
 } from "@/lib/queries";
 import { CoachButton } from "@/components/CoachButton";
 import { PreferencesForm } from "@/components/PreferencesForm";
+import { RoleSwitchButton } from "@/components/RoleSwitchButton";
 import {
   Avatar,
   ProofBar,
@@ -189,6 +190,18 @@ export default async function MePage() {
           ))}
         </ul>
       </section>
+
+      <Reveal>
+        <section className="rounded-2xl p-6 panel">
+          <h2 className="mb-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+            compte
+          </h2>
+          <p className="mb-4 text-sm text-slate-400">
+            Vous recrutez plutôt que vous cherchez un poste ? Basculez en compte recruteur pour publier des offres.
+          </p>
+          <RoleSwitchButton to="RECRUITER" label="Passer en compte recruteur" pendingText="Changement…" />
+        </section>
+      </Reveal>
     </div>
   );
 }
