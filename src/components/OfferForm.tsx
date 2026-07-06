@@ -55,6 +55,14 @@ export function OfferForm({ offer }: { offer?: OfferInit }) {
   const updateSkill = (i: number, patch: Partial<SkillRow>) =>
     setSkills((s) => s.map((x, idx) => (idx === i ? { ...x, ...patch } : x)));
 
+  const hasSkill = (name: string) =>
+    skills.some((s) => s.name.toLowerCase() === name.toLowerCase());
+  // Suggestion déjà ajoutée : la puce la retire ("- React") ; sinon elle l'ajoute ("+ React").
+  const toggleSuggestion = (name: string) =>
+    hasSkill(name)
+      ? setSkills((s) => s.filter((x) => x.name.toLowerCase() !== name.toLowerCase()))
+      : addSkill(name);
+
   const cleanSkills = skills.filter((s) => s.name.trim());
 
   return (
@@ -165,16 +173,24 @@ export function OfferForm({ offer }: { offer?: OfferInit }) {
         </button>
 
         <div className="mt-4 flex flex-wrap gap-1.5">
-          {SUGGESTIONS.map((name) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => addSkill(name)}
-              className="rounded-md bg-white/5 px-2 py-0.5 font-mono text-xs text-slate-400 ring-1 ring-white/10 transition hover:text-emerald-300"
-            >
-              + {name}
-            </button>
-          ))}
+          {SUGGESTIONS.map((name) => {
+            const active = hasSkill(name);
+            return (
+              <button
+                key={name}
+                type="button"
+                onClick={() => toggleSuggestion(name)}
+                className={`rounded-md px-2 py-0.5 font-mono text-xs ring-1 transition ${
+                  active
+                    ? "bg-emerald-400/10 text-emerald-300 ring-emerald-400/30 hover:text-rose-300"
+                    : "bg-white/5 text-slate-400 ring-white/10 hover:text-emerald-300"
+                }`}
+              >
+                {active ? "- " : "+ "}
+                {name}
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import { Avatar } from "@/components/match-ui";
 import { Logo } from "@/components/Logo";
 import { CommandPalette } from "@/components/CommandPalette";
 import { PaletteTrigger } from "@/components/PaletteTrigger";
+import { NavLinks } from "@/components/NavLinks";
 import { SubmitButton } from "@/components/SubmitButton";
 import "./globals.css";
 
@@ -18,9 +19,6 @@ export const metadata: Metadata = {
   description:
     "Proov classe les candidats pour vos offres à partir de compétences vérifiées dans leur code GitHub, avec un score explicable.",
 };
-
-const navLink =
-  "rounded-md px-3 py-1.5 text-slate-400 transition hover:bg-white/5 hover:text-emerald-300";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
@@ -39,29 +37,13 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
             <nav className="flex items-center gap-0.5 font-mono text-sm sm:gap-1">
               <PaletteTrigger />
-              <Link href="/" className={navLink}>Offres</Link>
-              {isRecruiter ? (
-                <Link href="/candidates" className={navLink}>Candidats</Link>
-              ) : null}
-              {isRecruiter ? (
-                <Link href="/stats" className={navLink}>Stats</Link>
-              ) : null}
-              {user?.role === "CANDIDATE" ? (
-                <Link href="/me" className={navLink}>Profil</Link>
-              ) : null}
-              {isRecruiter ? (
-                <Link href={`/recruiters/${user!.id}`} className={navLink}>Profil</Link>
-              ) : null}
-              {user ? (
-                <Link href="/messages" className={`relative ${navLink}`}>
-                  Messages
-                  {unread > 0 ? (
-                    <span className="ml-1.5 rounded-full bg-emerald-400 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-emerald-950">
-                      {unread}
-                    </span>
-                  ) : null}
-                </Link>
-              ) : null}
+              <NavLinks
+                loggedIn={Boolean(user)}
+                isRecruiter={isRecruiter}
+                isCandidate={user?.role === "CANDIDATE"}
+                recruiterId={user?.id}
+                unread={unread}
+              />
 
               {user ? (
                 <div className="ml-1 flex items-center gap-2 border-l border-white/10 pl-2 sm:ml-2 sm:pl-3">
