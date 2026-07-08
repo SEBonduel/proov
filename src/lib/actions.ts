@@ -255,6 +255,23 @@ export type LinkState = { error?: string };
 const GH_USERNAME = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$/;
 
 /**
+ * Droit à l'effacement (RGPD) : le candidat supprime son profil analysé et
+ * toutes les données dérivées (compétences, matchs, embedding), et détache son
+ * GitHub. Le compte utilisateur reste, prêt à reconnecter un GitHub s'il le souhaite.
+ */
+export async function deleteMyCandidateData(): Promise<void> {
+  const user = await requireUser();
+  const candidate = await prisma.candidate.findUnique({ where: { userId: user.id } });
+  if (candidate) {
+    // Les compétences et les matchs sont supprimés en cascade (onDelete: Cascade).
+    await prisma.candidate.delete({ where: { id: candidate.id } });
+  }
+  await prisma.user.update({ where: { id: user.id }, data: { githubLogin: null } }).catch(() => {});
+  revalidatePath("/me");
+  redirect("/me");
+}
+
+/**
  * Relie un compte candidat (créé par email/mot de passe) à un profil GitHub :
  * ingère et analyse le profil public, puis lie le candidat au compte.
  */

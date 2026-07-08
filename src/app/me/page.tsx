@@ -10,6 +10,7 @@ import {
 import { CoachButton } from "@/components/CoachButton";
 import { PreferencesForm } from "@/components/PreferencesForm";
 import { RoleSwitchButton } from "@/components/RoleSwitchButton";
+import { DeleteMyDataButton } from "@/components/DeleteMyDataButton";
 import {
   Avatar,
   ProofBar,
@@ -200,6 +201,23 @@ export default async function MePage() {
             Vous recrutez plutôt que vous cherchez un poste ? Basculez en compte recruteur pour publier des offres.
           </p>
           <RoleSwitchButton to="RECRUITER" label="Passer en compte recruteur" pendingText="Changement…" />
+        </section>
+      </Reveal>
+
+      <Reveal>
+        <section className="rounded-2xl p-6 panel">
+          <h2 className="mb-1 font-mono text-xs uppercase tracking-wider text-slate-500">
+            confidentialité
+          </h2>
+          <p className="mb-4 text-sm text-slate-400">
+            Proov n&apos;analyse que votre code <strong className="text-slate-300">public</strong>, avec votre accord.
+            Vous pouvez supprimer à tout moment votre profil analysé et toutes les données dérivées. Voir la{" "}
+            <Link href="/confidentialite" className="text-emerald-300 hover:underline">
+              politique de confidentialité
+            </Link>
+            .
+          </p>
+          <DeleteMyDataButton />
         </section>
       </Reveal>
     </div>
