@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 // Liens de navigation avec mise en évidence de l'onglet actif (même thème,
 // accent émeraude). L'état actif est déduit du chemin courant.
-const base = "rounded-md px-3 py-1.5 transition";
+const base = "shrink-0 whitespace-nowrap rounded-md px-3 py-1.5 transition";
 const idle = "text-slate-400 hover:bg-white/5 hover:text-emerald-300";
 const active = "bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/20";
 

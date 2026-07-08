@@ -35,7 +35,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <Logo />
             </Link>
 
-            <nav className="flex items-center gap-0.5 font-mono text-sm sm:gap-1">
+            <nav className="no-scrollbar flex min-w-0 items-center gap-0.5 overflow-x-auto font-mono text-sm sm:gap-1">
               <PaletteTrigger />
               <NavLinks
                 loggedIn={Boolean(user)}
@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               />
 
               {user ? (
-                <div className="ml-1 flex items-center gap-2 border-l border-white/10 pl-2 sm:ml-2 sm:pl-3">
+                <div className="ml-1 flex shrink-0 items-center gap-2 border-l border-white/10 pl-2 sm:ml-2 sm:pl-3">
                   <Avatar name={user.name ?? "?"} seed={user.email ?? user.name ?? "u"} size={28} />
                   <span className="hidden text-xs text-slate-400 md:inline">
                     {user.name}

@@ -48,6 +48,7 @@ export function CandidateSearch({ children }: { children: ReactNode }) {
             name="query"
             defaultValue={state.query ?? ""}
             placeholder="Décrivez le profil recherché en langage naturel…"
+            aria-label="Recherche de candidats en langage naturel"
             className="w-full bg-transparent py-3 text-sm text-slate-100 outline-none placeholder:text-slate-600"
           />
           <button
