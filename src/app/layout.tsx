@@ -94,6 +94,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6 py-5 text-center font-mono text-xs text-slate-600">
             <span>Proov. La preuve par le code, pas les promesses du CV.</span>
             <span className="text-slate-700">·</span>
+            <Link href="/methode" className="transition hover:text-emerald-300">
+              Méthode
+            </Link>
+            <span className="text-slate-700">·</span>
             <Link href="/confidentialite" className="transition hover:text-emerald-300">
               Confidentialité
             </Link>

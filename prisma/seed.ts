@@ -8,7 +8,9 @@ import { FIXTURE_PROFILES } from "./fixtures";
 // Personnalisable via SEED_GITHUB_LOGINS (liste séparée par des virgules dans .env).
 // (Sans token, on évite la limite de 60 req/h en s'appuyant sur les fixtures.)
 const REAL_GITHUB_LOGINS = (
-  process.env.SEED_GITHUB_LOGINS ?? "gaearon,sindresorhus,tj"
+  // Profils réels et variés (frontend, écosystème JS, backend/Go, Vue, Python)
+  // riches en contributions publiques, pour une démo convaincante.
+  process.env.SEED_GITHUB_LOGINS ?? "gaearon,sindresorhus,tj,yyx990803,tiangolo"
 )
   .split(",")
   .map((s) => s.trim())
