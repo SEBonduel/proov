@@ -57,6 +57,8 @@ function compactProfile(profile: GitHubProfileData) {
       pushedAt: r.pushedAt,
       // Repo de contribution (code d'autrui) : preuve plus faible qu'un projet perso.
       contribution: r.isContributed ?? false,
+      // Projet testé (framework de test déclaré) : signal de rigueur.
+      tested: r.hasTests ?? false,
       dependencies: r.manifests.flatMap((m) => m.dependencies).slice(0, 40),
     })),
   };
@@ -65,7 +67,7 @@ function compactProfile(profile: GitHubProfileData) {
 const SYSTEM_INSTRUCTION = `Tu es un expert technique qui analyse les données RÉELLES d'un profil GitHub pour en déduire les compétences PROUVÉES par le code.
 Règles strictes :
 - Ne liste QUE des compétences attestées par les données fournies (langages en octets, dépendances des manifestes, topics). N'invente rien.
-- proofStrength (0-100) reflète la FORCE de la preuve : volume de code, nombre de projets, étoiles, récence.
+- proofStrength (0-100) reflète la FORCE de la preuve : volume de code, nombre de projets, étoiles, récence, présence de tests (tested=true) et contributions à des projets tiers (à valoriser un peu plus).
 - recencyMonths = nombre de mois depuis la dernière utilisation, déduit des dates "pushedAt" des repos concernés.
 - evidenceRepos = URLs des repos (issues des données) qui prouvent la compétence.
 - reasoning = une phrase courte en français justifiant la preuve.

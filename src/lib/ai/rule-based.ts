@@ -1,6 +1,10 @@
 import type { GitHubProfileData, RepoSignal } from "@/lib/github";
 import type { ExtractedSkill, ExtractionResult, SkillCategory, SkillExtractor } from "./types";
 import { DEPENDENCY_SKILLS, NON_SKILL_LANGUAGES, TOPIC_SKILLS } from "./skill-mappings";
+import { repoHasTests } from "../signals";
+
+// Bonus de preuve léger quand la compétence est étayée par un projet testé.
+const testBonus = (repos: RepoSignal[]) => (repos.some(repoHasTests) ? 8 : 0);
 
 // Extracteur par règles (fallback déterministe, sans IA)
 //
@@ -55,7 +59,8 @@ function languageSkills(profile: GitHubProfileData): ExtractedSkill[] {
         20 + // présence avérée
           Math.min(35, Math.log10(bytes + 1) * 8) + // volume de code
           share * 25 + // dominance dans le code du candidat
-          Math.min(20, repoCount * 6), // diffusion sur plusieurs projets
+          Math.min(20, repoCount * 6) + // diffusion sur plusieurs projets
+          testBonus(reposWithLang), // projets testés = preuve plus solide
       ),
     );
 
@@ -109,7 +114,8 @@ function dependencySkills(profile: GitHubProfileData): ExtractedSkill[] {
       Math.round(
         35 + // présent dans un vrai manifeste de dépendances
           Math.min(35, repoCount * 12) + // utilisé sur plusieurs projets
-          Math.min(20, Math.log10(entry.totalStars + 1) * 10), // projets avec traction
+          Math.min(20, Math.log10(entry.totalStars + 1) * 10) + // projets avec traction
+          testBonus(entry.repos), // projets testés = preuve plus solide
       ),
     );
     skills.push({

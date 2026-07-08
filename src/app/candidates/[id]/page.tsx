@@ -7,6 +7,7 @@ import { Reveal } from "@/components/Reveal";
 import { LanguageBar } from "@/components/LanguageBar";
 import { InterviewKit } from "@/components/InterviewKit";
 import { CodeProofButton } from "@/components/CodeProofButton";
+import { engineeringSignals, repoHasTests } from "@/lib/signals";
 
 const CATEGORY_ORDER = ["LANGUAGE", "FRAMEWORK", "DATABASE", "TOOL", "DOMAIN"];
 
@@ -52,10 +53,13 @@ export default async function CandidatePage({
       description: string | null;
       primaryLanguage: string | null;
       stars: number;
+      pushedAt?: string | null;
+      manifests?: { dependencies?: string[] }[];
       isContributed?: boolean;
     }[];
   } | null;
   const languages = rawData?.languageTotals ?? {};
+  const signals = engineeringSignals(rawData?.repos ?? []);
 
   // Projets : d'abord ceux du candidat (par étoiles), puis ses contributions.
   const repos = (rawData?.repos ?? [])
@@ -177,6 +181,52 @@ export default async function CandidatePage({
         </Reveal>
       ) : null}
 
+      {signals.ownedRepos > 0 ? (
+        <Reveal delay={0.085}>
+          <section className="rounded-2xl p-6 panel">
+            <h2 className="mb-4 font-mono text-xs uppercase tracking-widest text-slate-500">
+              signaux d&apos;ingénierie
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                {
+                  label: "Projets testés",
+                  value: `${signals.testedRepos}/${signals.ownedRepos}`,
+                  hint: "framework de test détecté",
+                  accent: signals.testedRepos > 0,
+                },
+                {
+                  label: "Contributions",
+                  value: `${signals.contributions}`,
+                  hint: "dépôts publics d'autrui",
+                  accent: signals.contributions > 0,
+                },
+                {
+                  label: "Repos actifs",
+                  value: `${signals.activeRepos}`,
+                  hint: "poussés sous 12 mois",
+                  accent: signals.activeRepos > 0,
+                },
+                {
+                  label: "Étoiles cumulées",
+                  value: `${signals.totalStars}`,
+                  hint: "traction publique",
+                  accent: signals.totalStars > 0,
+                },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
+                  <div className={`text-2xl font-bold tabular-nums ${s.accent ? "text-emerald-300" : "text-slate-400"}`}>
+                    {s.value}
+                  </div>
+                  <div className="mt-0.5 text-xs font-medium text-slate-300">{s.label}</div>
+                  <div className="mt-0.5 font-mono text-[10px] text-slate-600">{s.hint}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </Reveal>
+      ) : null}
+
       {repos.length > 0 ? (
         <Reveal delay={0.09}>
           <section className="rounded-2xl p-6 panel">
@@ -208,6 +258,7 @@ export default async function CandidatePage({
                   <div className="mt-auto flex items-center gap-3 pt-3 font-mono text-[11px] text-slate-600">
                     {r.primaryLanguage ? <span>{r.primaryLanguage}</span> : null}
                     {r.stars > 0 ? <span>★ {r.stars}</span> : null}
+                    {repoHasTests(r) ? <span className="text-emerald-400/80">✓ tests</span> : null}
                   </div>
                 </a>
               ))}

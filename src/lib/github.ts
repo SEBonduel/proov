@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+import { repoHasTests } from "./signals";
 
 // Ingestion GitHub
 //
@@ -31,6 +32,8 @@ export interface RepoSignal {
   createdAt: string | null;
   manifests: RepoManifestDeps[];
   readmeExcerpt: string | null;
+  /** true si un framework de test est déclaré dans les dépendances (signal de rigueur). */
+  hasTests?: boolean;
   /** true si le candidat a contribué au repo sans en être le propriétaire. */
   isContributed?: boolean;
   /** propriétaire du repo (utile pour les repos de contribution). */
@@ -417,6 +420,7 @@ export async function fetchGitHubProfile(
       createdAt: r.created_at ?? null,
       manifests,
       readmeExcerpt,
+      hasTests: repoHasTests({ manifests }),
     });
   }
 
