@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && ([ \"$GITHUB_ACTIONS\" = true ] || prisma migrate deploy) && next build",
+    "build": "prisma generate && ([ \"$GITHUB_ACTIONS\" = true ] || prisma migrate deploy || echo 'migrate deploy ignore (best-effort)') && next build",
     "db:deploy": "prisma migrate deploy",
     "start": "next start",
     "lint": "eslint",
