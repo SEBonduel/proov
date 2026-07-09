@@ -33,6 +33,7 @@ Le principe tient en une phrase : une compétence prouvée par le code vaut mieu
 - **Ingestion GitHub** : langages en octets, frameworks et bases détectés dans les manifestes (`package.json`, `pubspec.yaml`, `requirements.txt`, `go.mod`, `Cargo.toml`...), score d'activité, et repos publics auxquels le candidat a contribué sans en être propriétaire.
 - **Analyse de compétences** : une couche IA agnostique au fournisseur (Google Gemini, avec un repli déterministe par règles si aucune clé n'est disponible). Les résultats sont mis en cache en base, donc la consultation reste instantanée.
 - **Matching explicable** : score pondéré par l'importance de chaque compétence requise, décote de récence, gestion des compétences obligatoires, atouts complémentaires, et radar de couverture.
+- **Signaux d'ingénierie** : présence de tests (framework détecté), maintenance (dépôts actifs), contributions à des projets tiers et traction (étoiles). Affichés sur le profil et pris en compte pour renforcer la preuve.
 
 **Ce qui fait la différence**
 
@@ -43,12 +44,14 @@ Le principe tient en une phrase : une compétence prouvée par le code vaut mieu
 
 **Le reste**
 
-- **Deux rôles** : candidat (profil auto-analysé, offres où il matche, préférences) et recruteur (publication et gestion d'offres, classement des candidats, statistiques).
+- **Deux rôles** : candidat (profil auto-analysé, offres où il matche, préférences) et recruteur (publication et gestion d'offres, classement des candidats, statistiques). On peut basculer d'un rôle à l'autre depuis le profil.
 - **Préférences candidat** : télétravail, mobilité, distance, types de contrat, disponibilité, visibles par les recruteurs.
 - **Authentification** : GitHub OAuth ou email / mot de passe.
 - **Candidatures et messagerie** : un candidat postule et voit sa propre adéquation ; le classement complet reste réservé au recruteur propriétaire de l'offre. Une messagerie quasi temps réel relie les deux.
 - **Tableau de bord recruteur** : pipeline des candidatures, répartition des scores, compétences les plus demandées.
-- **Détails d'UX** : thème sombre type éditeur de code, palette de commandes (Cmd+K), animations d'entrée, indicateurs de chargement partout.
+- **Confidentialité (RGPD)** : consentement explicite avant toute analyse, droit à l'effacement (le candidat supprime son profil et les données dérivées en un clic), page de politique de confidentialité.
+- **Accessibilité et mobile** : respect de `prefers-reduced-motion`, focus clavier visible, `aria-label` sur les champs, navigation dense adaptée aux petits écrans.
+- **Détails d'UX** : thème sombre type éditeur de code, palette de commandes (Cmd+K), onglet actif mis en évidence, animations d'entrée, indicateurs de chargement partout.
 
 ## Comment ça marche
 
@@ -61,6 +64,16 @@ Le flux, de bout en bout :
 5. Le **moteur de matching** croise les deux et produit un score explicable, puis un classement.
 
 L'analyse IA n'est faite qu'une seule fois, à l'ingestion, puis mise en cache. La consultation ne déclenche aucun appel externe et reste instantanée.
+
+## Limites et éthique
+
+Proov assume ses limites plutôt que de les cacher (détaillées sur la page `/methode` de l'application) :
+
+- **Biais du code public.** Proov ne voit que ce qui est public. Les développeurs dont le code est privé ou propriétaire sont désavantagés. Le produit vise surtout l'alternance, les stages et les profils juniors, où le code public est fréquent.
+- **Prouver n'est pas maîtriser.** Utiliser une technologie est un indice d'usage, pas une garantie d'expertise ; le score est un point de départ, à confirmer en entretien.
+- **Un complément, pas un substitut.** Proov ne remplace ni le CV ni l'entretien : il réduit le tri à l'aveugle.
+
+Côté données (RGPD, détaillé sur `/confidentialite`) : uniquement des données publiques, consentement explicite pour les candidats qui se connectent, aucun accès au code privé, et droit à l'effacement immédiat.
 
 ## Stack technique
 
@@ -137,7 +150,7 @@ Sans `GEMINI_API_KEY`, l'analyse bascule sur le repli déterministe : l'applicat
 ## Tests
 
 ```bash
-npm test          # Vitest : moteur de matching et extraction par règles
+npm test          # Vitest : moteur de matching, extraction par règles, signaux d'ingénierie
 ```
 
 ## Scripts utiles
@@ -155,12 +168,14 @@ npm test          # Vitest : moteur de matching et extraction par règles
 
 ```
 src/
-  app/            Pages et routes (App Router), route SSE d'analyse live
+  app/            Pages et routes (App Router), route SSE d'analyse live,
+                  pages /methode et /confidentialite
   components/     Composants d'interface (cartes, formulaires, graphiques)
   lib/
     github.ts     Ingestion GitHub (dépôts, langages, contributions)
     ai/           Couche IA : extraction, embeddings, coaching, entretien, repli
     matching.ts   Moteur de matching explicable
+    signals.ts    Signaux d'ingénierie (tests, maintenance, contributions)
     code-evidence.ts  Recherche des extraits de code qui prouvent une compétence
     search.ts     Recherche sémantique de candidats
     actions.ts    Server Actions (mutations)
