@@ -28,8 +28,8 @@ export default function PrivacyPage() {
       <Reveal delay={0.04}>
         <Section title="Quelles données">
           <p>
-            Proov utilise uniquement des données <strong className="text-slate-100">publiques</strong> issues
-            de GitHub : votre pseudo, vos dépôts publics (noms, descriptions, langages, dépendances déclarées,
+            Proov utilise uniquement des données <strong className="text-slate-100">publiques</strong>{" "}
+            issues de GitHub : votre pseudo, vos dépôts publics (noms, descriptions, langages, dépendances déclarées,
             sujets, activité), et les projets publics auxquels vous avez contribué. À partir de ces signaux,
             Proov déduit des compétences, chacune avec une force de preuve et les dépôts qui l&apos;attestent.
           </p>
@@ -52,8 +52,8 @@ export default function PrivacyPage() {
             Finalité : révéler des compétences prouvées par le code et les mettre en relation avec des offres.
           </p>
           <p>
-            Base légale : le <strong className="text-slate-100">consentement</strong> pour les candidats qui
-            connectent eux-mêmes leur GitHub (case à cocher explicite avant l&apos;analyse) ; pour les profils
+            Base légale : le <strong className="text-slate-100">consentement</strong>{" "}
+            pour les candidats qui connectent eux-mêmes leur GitHub (case à cocher explicite avant l&apos;analyse) ; pour les profils
             de démonstration présents dans le vivier, seules des données manifestement publiques sont utilisées,
             et tout profil peut être retiré sur simple demande.
           </p>
@@ -75,31 +75,19 @@ export default function PrivacyPage() {
           <p>Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification et d&apos;effacement.</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>
-              <strong className="text-slate-100">Accès</strong> : votre profil analysé est visible depuis votre
+              <strong className="text-slate-100">Accès</strong>{" "}: votre profil analysé est visible depuis votre
               espace, dans <Link href="/me" className="text-emerald-300 hover:underline">Mon profil</Link>.
             </li>
             <li>
-              <strong className="text-slate-100">Rectification</strong> : mettez à jour vos dépôts publics sur
+              <strong className="text-slate-100">Rectification</strong>{" "}: mettez à jour vos dépôts publics sur
               GitHub, puis relancez l&apos;analyse.
             </li>
             <li>
               <strong className="text-slate-100">Effacement</strong> : le bouton « Supprimer mes données
               d&apos;analyse » sur votre profil supprime tout immédiatement. Pour un profil du vivier non
-              connecté, écrivez-nous.
+              connecté, la suppression se fait sur simple demande.
             </li>
           </ul>
-        </Section>
-      </Reveal>
-
-      <Reveal delay={0.14}>
-        <Section title="Contact">
-          <p>
-            Pour toute question ou demande de suppression :{" "}
-            <a href="mailto:contact@proov.dev" className="text-emerald-300 hover:underline">
-              contact@proov.dev
-            </a>
-            .
-          </p>
         </Section>
       </Reveal>
 

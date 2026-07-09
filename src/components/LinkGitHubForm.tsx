@@ -57,7 +57,7 @@ export function LinkGitHubForm() {
           className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-400"
         />
         <span>
-          J&apos;autorise Proov à analyser mon code <strong className="text-slate-300">public</strong> GitHub pour
+          J&apos;autorise Proov à analyser mon code <strong className="text-slate-300">public</strong>{" "}GitHub pour
           révéler mes compétences prouvées. Voir la{" "}
           <Link href="/confidentialite" className="text-emerald-300 hover:underline">
             politique de confidentialité

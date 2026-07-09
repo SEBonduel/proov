@@ -40,7 +40,7 @@ export default function MethodPage() {
         <Section title="De signal à compétence prouvée">
           <p>
             Une couche d&apos;analyse transforme ces signaux en compétences, chacune avec une
-            <strong className="text-slate-100"> force de preuve</strong> (volume de code, nombre de projets,
+            <strong className="text-slate-100">force de preuve</strong>{" "}(volume de code, nombre de projets,
             récurrence, étoiles) et une <strong className="text-slate-100">récence</strong>. Rien n&apos;est
             inventé : une compétence n&apos;apparaît que si les données publiques l&apos;attestent, et vous
             pouvez remonter jusqu&apos;aux dépôts et aux extraits de code qui la prouvent.
@@ -65,18 +65,18 @@ export default function MethodPage() {
         <Section title="Les limites, assumées">
           <ul className="list-disc space-y-1 pl-5">
             <li>
-              <strong className="text-slate-100">Biais du code public.</strong> Proov ne voit que ce qui est
+              <strong className="text-slate-100">Biais du code public.</strong>{" "}Proov ne voit que ce qui est
               public. Les développeurs dont le code est privé ou propriétaire (la majorité en entreprise) sont
               donc désavantagés. Proov est surtout pertinent pour l&apos;alternance, les stages et les profils
               juniors, où le code public est fréquent.
             </li>
             <li>
-              <strong className="text-slate-100">Prouver n&apos;est pas maîtriser.</strong> Utiliser une
+              <strong className="text-slate-100">Prouver n&apos;est pas maîtriser.</strong>{" "}Utiliser une
               technologie dans un projet est un indice, pas une garantie d&apos;expertise. Le score reflète une
               preuve d&apos;usage, à confirmer en entretien.
             </li>
             <li>
-              <strong className="text-slate-100">Un complément, pas un substitut.</strong> Proov ne remplace ni
+              <strong className="text-slate-100">Un complément, pas un substitut.</strong>{" "}Proov ne remplace ni
               le CV ni l&apos;entretien. Il donne un point de départ objectif pour réduire le tri à l&apos;aveugle.
             </li>
           </ul>
