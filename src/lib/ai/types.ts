@@ -31,7 +31,7 @@ export interface ExtractionResult {
 
 /**
  * Contrat commun à tous les extracteurs de compétences. Permet de brancher
- * n'importe quel fournisseur (Gemini, Claude, local…) ou un fallback par règles,
+ * n'importe quel fournisseur (Gemini, local…) ou un fallback par règles,
  * sans changer le reste de l'application.
  */
 export interface SkillExtractor {
