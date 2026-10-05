@@ -142,7 +142,7 @@ npm run dev            # http://localhost:3000
 | `AUTH_GITHUB_ID` / `AUTH_GITHUB_SECRET` | OAuth App GitHub pour la connexion (optionnel) |
 | `GITHUB_TOKEN` | Token GitHub pour l'ingestion et la recherche de code (optionnel mais recommandé) |
 | `GEMINI_API_KEY` | Clé Google AI Studio, gratuite (optionnel, repli par règles sinon) |
-| `GEMINI_MODEL` | Modèle Gemini (défaut `gemini-2.0-flash`) |
+| `GEMINI_MODEL` | Modèle Gemini (défaut `gemini-2.5-flash`) |
 | `SEED_GITHUB_LOGINS` | Pseudos GitHub réels à ingérer au seed (ex. `tonpseudo,gaearon`) |
 
 Sans `GEMINI_API_KEY`, l'analyse bascule sur le repli déterministe : l'application reste entièrement utilisable.

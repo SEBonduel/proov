@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { geminiModel } from "./gemini";
 
 export interface SkillGap {
   name: string;
@@ -36,7 +37,7 @@ Donne 2 à 3 conseils concrets et motivants en français (quoi apprendre en prio
     try {
       const ai = new GoogleGenAI({ apiKey: key });
       const res = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+        model: geminiModel(),
         contents: prompt,
         config: { temperature: 0.5 },
       });

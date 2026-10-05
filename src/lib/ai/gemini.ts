@@ -105,12 +105,17 @@ const responseSchema = {
   required: ["skills", "summary"],
 };
 
+// Modèle utilisé par tous les appels Gemini (gemini-2.0-flash a été retiré par Google).
+export function geminiModel(): string {
+  return process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+}
+
 export class GeminiExtractor implements SkillExtractor {
   readonly name = "gemini";
   private client: GoogleGenAI;
   private model: string;
 
-  constructor(apiKey: string, model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash") {
+  constructor(apiKey: string, model = geminiModel()) {
     this.client = new GoogleGenAI({ apiKey });
     this.model = model;
   }

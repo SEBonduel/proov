@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { z } from "zod";
+import { geminiModel } from "./gemini";
 
 // Kit d'entretien généré par l'IA
 //
@@ -125,7 +126,7 @@ Données : ${JSON.stringify(facts)}`;
     try {
       const ai = new GoogleGenAI({ apiKey: key });
       const res = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+        model: geminiModel(),
         contents: prompt,
         config: {
           responseMimeType: "application/json",

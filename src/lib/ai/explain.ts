@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import type { MatchResult } from "@/lib/matching";
+import { geminiModel } from "./gemini";
 
 // Génère une explication en langage naturel d'un score de matching.
 // Gemini si disponible, sinon repli déterministe à partir de la décomposition.
@@ -44,7 +45,7 @@ Sois concret, mentionne les compétences clés, n'invente rien, pas d'introducti
     try {
       const ai = new GoogleGenAI({ apiKey: key });
       const res = await ai.models.generateContent({
-        model: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
+        model: geminiModel(),
         contents: prompt,
         config: { temperature: 0.3 },
       });
